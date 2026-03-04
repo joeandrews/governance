@@ -34,12 +34,12 @@ The Core Contributors are a representative governance body that serves as the pr
 Given the number and diversity of contributors within the Aztec Network, the composition of the Core Contributors ensures proper representation of multiple stakeholder groups:
 
 - **Client Teams** → teams responsible for developing Aztec clients (up to two representatives per team).
-- **Founders** → two perpetual seats reserved for original Aztec Labs founders Joe Andrews and Zac Williamson.
+- **Founders** → two seats reserved for original Aztec Labs founders Joe Andrews and Zac Williamson.
 - **Sequencers** → representatives of the active sequencers securing and operating the Aztec Network.
 - **Ecosystem** → representatives of dApp developers and broader ecosystem partners.
 - **Noir** → representatives of the Noir language and its developer community.
 
-The representatives of Ecosystem, Noir and Sequencers can be changed via an AZIP proposal put forward by anyone.
+All representatives, including Founders, can be changed via an AZIP proposal put forward by anyone.
 
 Currently, the Core Contributors are composed of the following representatives:
 
@@ -53,7 +53,7 @@ Currently, the Core Contributors are composed of the following representatives:
 
 Tokenholders play a direct role in Aztec governance by staking their tokens and participating in onchain votes. Any tokenholder may participate in governance votes by connecting their wallet to the governance dashboard, staking into the Token Vault, and locking tokens for at least 15 days to ensure proposals can be executed before they exit. 
 
-Once a proposal is created by sequencers, all eligible Token Vault holders can vote during a 7‑day voting window, following a fixed timeline that includes an initial waiting period, a voting period, an execution delay, and a final grace period for execution. For a proposal to pass, at least 100 million tokens must participate in the vote, and a minimum of 66% of the votes cast must be in favor.
+Once a proposal is created by sequencers, all eligible Token Vault holders can vote during a 7‑day voting window, following a fixed timeline that includes an initial waiting period, a voting period, an execution delay, and a final grace period for execution. For a proposal to pass, at least 100 million tokens must participate in the vote, a minimum of 66% of the votes cast must be in favor, and voting power equivalent to at least 500 validators must participate to ensure a broad enough security base.
 
 Aztec Labs and Aztec Foundation teams, as well as investors, are excluded from staking and governance for the first 12 months (including the TGE vote), with their tokens locked for 1 year and then vesting over the following 2 years. 
 

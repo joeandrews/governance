@@ -36,11 +36,11 @@ The Core Contributors are a representative governance body that serves as the pr
 - Sequencers → Koen van Marrewijk
 - Founders → Joe Andrews and Zac Williamson
 
-The representatives of Ecosystem, Noir and Sequencers can be changed via an AZIP proposal put forward by anyone.
+All representatives, including Founders, can be changed via an AZIP proposal put forward by anyone.
 
 ### Core Contributor Weekly
 
-The Core Contributor Weekly is a call held once a week to discuss various initiatives involving the Aztec Network. Agendas can be found on the [Issues tab](https://github.com/abbey-titcomb/aztec-governance/issues).
+The Core Contributor Weekly is a call held once a week to discuss various initiatives involving the Aztec Network. Agendas can be found on the [Issues tab](https://github.com/AztecProtocol/governance/issues).
 
 If you would like to join these calls as an observer please contact the current facilitator.
 
@@ -67,7 +67,7 @@ Core Contributors will publicly report on the outcome of their weekly meetings a
 
 ### **Payloads**
 
-For each scheduled AZUP, Core Contributors deploy one or more payload contracts on Ethereum mainnet that encode the exact on‑chain changes (via functions such as ‎`getActions()`). The payload’s `getActions()` function describes the exact sequence of contract calls that will occur if governance approves the upgrade. The payload is the single source of truth for what an approved proposal will actually do on-chain. Once the payloads are deployed and announced to the network, the AZUP is considered formally proposed and ready for sequencer signaling. Each payload must be merged into the AZIP repository in the `/AZUP` folder and tagged with the corresponding AZIP/AZUP before deployment.
+For each scheduled AZUP, Core Contributors deploy one or more payload contracts on Ethereum mainnet that encode the exact on‑chain changes (via functions such as ‎`getActions()`). The payload’s `getActions()` function describes the exact sequence of contract calls that will occur if governance approves the upgrade. The payload is the single source of truth for what an approved proposal will actually do on-chain. Once the payloads are deployed and announced to the network, the AZUP is considered formally proposed and ready for sequencer signaling. Each payload must be merged into the AZIP repository in the `/AZUPs` folder and tagged with the corresponding AZIP/AZUP before deployment.
 
 Once payloads are deployed, Core Contributors publish a forum post following the AZUP Template. For more on how payloads are structured, see [sequencer documentation](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals).
 

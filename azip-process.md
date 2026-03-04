@@ -29,11 +29,11 @@ AZIPs that require onchain implementation are bundled into AZUPs by Core Contrib
 
 Each AZIP progresses through a defined set of stages that govern how it is proposed, reviewed, finalized, and, where applicable, implemented onchain. 
 
-All AZIPs start as informal ideas discussed freely on the Aztec forum. Once properly specified, they are submitted to the official AZIP GitHub repository in the form of a version-controlled document that acts as the single source of truth for that proposal. From there, an AZIP progresses through the following stages:
+All AZIPs start as informal ideas discussed freely in GitHub Discussions on the AZIP repository. Once properly specified, they are submitted to the official AZIP GitHub repository in the form of a version-controlled document that acts as the single source of truth for that proposal. From there, an AZIP progresses through the following stages:
 
-1. `Idea`*:* Proposal is in pre‑draft concept form and in process of being discussed and refined in the [Aztec forum](https://forum.aztec.network/), in the AZIP category; AZIPs in `Idea` stage are not tracked in the AZIP repository.
+1. `Idea`*:* Proposal is in pre‑draft concept form and in process of being discussed and refined in GitHub Discussions on the AZIP repository; AZIPs in `Idea` stage are not tracked in the AZIP repository.
     - Criteria:
-        - Post in GitHub discussions
+        - Post in GitHub Discussions
 2. `Draft`: The first formally tracked stage in the AZIP repo.
     - Criteria:
         - All fields in AZIP template are completed (no TBDs)
@@ -41,13 +41,13 @@ All AZIPs start as informal ideas discussed freely on the Aztec forum. Once prop
     - Process:
         - An editor reviews and approves the proposal for peer review
         - PR is merged and AZIP is assigned a number by an editor
-        - Author has posted in GitHub discussions
+        - Author has posted in GitHub Discussions
 3. `Ready for Discussion (RFD)`: Represents the final standard; only minor errata or non‑normative clarifications may be added.
     - Criteria:
         - Peer review has been completed and documented, with provable engagement from impacted stakeholders
     - Process:
         - An editor reviews and approves the proposal for Core Contributor review
-        - Author has updated GitHub discussions
+        - Author has updated GitHub Discussions
 4. `Accepted`*:* AZIP has been accepted and implemented onchain via an AZUP (if applicable).
 5. `(if applicable) Cancelled` : The AZIP author(s) or editors have cancelled the proposed AZIP. This state has finality and can no longer be resurrected using this AZIP number. If the idea is pursued at a later date it is considered a new proposal. An AZIP may be moved to `Cancelled` at any point after it has been accepted as `Draft`.
 
@@ -77,6 +77,8 @@ Each AZIP should have the following parts:
     - Tests should either be inlined in the AZIP as data (such as input/expected output pairs, or included in `../assets/azip-###/<filename>`.
 - **Reference Implementation** (optional)
     - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all AZIPs.
+- **Treasury Considerations** (required for any proposals that mint new Aztec tokens or spend protocol controlled funds):
+    - All proposals that spend protocol funds should include a full economic analysis of the long-term effects on sequencing and proving the network for operators. Proposals that request funds from the treasury must clearly detail where the funds will go and how they will be spent. Any funds going to smart contracts must meet the Security Considerations below.
 - **Security Considerations** (required for `Core` and `Standard` AZIPs):
     - All `Core` and `Standard` AZIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. AZIP submissions missing the “Security Considerations” section will be rejected. An AZIP cannot proceed to status `RFD` without a Security Considerations discussion deemed sufficient by the reviewers.
 - **Copyright Waiver:**
@@ -113,7 +115,7 @@ For each new AZIP opened as a PR on the repository, an editor reads the AZIP to 
 - All fields in AZIP template are completed (no TBDs)
 - Title accurately describes content
 - Full specification is drafted, including technical implementation
-- Has been discussed in GitHub discussions
+- Has been discussed in GitHub Discussions
 - Has been checked for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style.
 - Ideas under review must be technically sound and coherent, even when their likelihood of reaching RFD status is unknown.
 
@@ -128,7 +130,7 @@ Once the AZIP is ready for the repository, the AZIP editor will:
 
 **`Draft -> Ready for Discussion (RFD)`**
 
-AZIP editors and proposal authors are responsible for socializing `Draft` AZIPs with impacted stakeholders for peer review. Review & discussion can happen in GitHub discussions, in comments on the pending PR to change proposal status from `Draft` to `RFD`, and in direct conversations with stakeholders. All feedback must be recorded and all design iterations documented in a way that allows proposal authors to demonstrate sufficient engagement from impacted stakeholders.
+AZIP editors and proposal authors are responsible for socializing `Draft` AZIPs with impacted stakeholders for peer review. Review & discussion can happen in GitHub Discussions, in comments on the pending PR to change proposal status from `Draft` to `RFD`, and in direct conversations with stakeholders. All feedback must be recorded and all design iterations documented in a way that allows proposal authors to demonstrate sufficient engagement from impacted stakeholders.
 
 Once a proposal author believes the AZIP represents the final standard, they submit a PR to update the status from `Draft` to `RFD`, including an overview of feedback gathered and changes made. AZIP editors are responsible for reviewing the AZIP and associated discussions to ensure it meets the following requirements: 
 

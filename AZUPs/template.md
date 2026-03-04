@@ -99,7 +99,7 @@ While an AZIP is a draft, a `discussions-to` header will indicate the URL where 
 
 ## NOTE: Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly. The exception is links to the [Aztec forum](https://forum.aztec.network/), which are permitted.
 
 ## NOTE: Linking to other AZIPs
 

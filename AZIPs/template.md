@@ -18,9 +18,9 @@
 | `title` | The AZIP title is a few words, not a complete sentence. |
 | `description` | Description is one full (short) sentence. |
 | `author` | Comma separated list of the author's. Example: `FirstName LastName (@GitHubUsername)`, `FirstName LastName <foo@bar.com>` |
-| `discussions-to` | The URL pointing to the official discussion thread in the [Aztec forum](https://discourse.aztec.network/). |
-| `status` | `Draft`, `Review`, `Final`, or `Cancelled` |
-| `category` | `Informational`, `Core`, or `Standard` |
+| `discussions-to` | The URL pointing to the official discussion thread in GitHub Discussions on the AZIP repository. |
+| `status` | `Draft`, `RFD`, `Accepted`, or `Cancelled` |
+| `category` | `Core`, `Treasury`, `Standard`, or `Informational` |
 | `created` | Date created on, in ISO 8601 (yyyy-mm-dd) format. |
 
 Headers that permit lists must separate elements with commas. Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
@@ -50,7 +50,7 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 ### `discussions-to` header
 
-While an AZIP is a draft, a `discussions-to` header will indicate the URL where the AZIP is being discussed (in the [Aztec forum](https://discourse.aztec.network/)).
+While an AZIP is a draft, a `discussions-to` header will indicate the URL where the AZIP is being discussed (in GitHub Discussions on the AZIP repository).
 
 ## Abstract
 
@@ -80,9 +80,13 @@ While an AZIP is a draft, a `discussions-to` header will indicate the URL where 
 
 - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all AZIPs.
 
+## **Treasury Considerations** (required for any proposals that mint new Aztec tokens or spend protocol controlled funds):
+
+- *All proposals that spend protocol funds should include a full economic analysis of the long-term effects on sequencing and proving the network for operators. Proposals that request funds from the treasury must clearly detail where the funds will go and how they will be spent. Any funds going to smart contracts must meet the Security Considerations below.*
+
 ## **Security Considerations** (required for `Core` and `Standard` AZIPs):
 
-- *All `Core` and `Standard` AZIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. AZIP submissions missing the "Security Considerations" section will be rejected. An AZIP cannot proceed to status `Final` without a Security Considerations discussion deemed sufficient by the reviewers.*
+- *All `Core` and `Standard` AZIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. AZIP submissions missing the "Security Considerations" section will be rejected. An AZIP cannot proceed to status `RFD` without a Security Considerations discussion deemed sufficient by the reviewers.*
 
 ## **Copyright Waiver:**
 
@@ -117,7 +121,7 @@ AZIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.html)
 
 ## NOTE: Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly. The exception is links to the [Aztec forum](https://forum.aztec.network/), which are permitted.
 
 ## NOTE: Linking to other AZIPs
 

@@ -2,7 +2,7 @@
 
 | azip | title | description | author | discussions-to | status | category | created |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| AZIP-X | [Title] | [Description (max 140 chars)] | [Author (@github)] | [Forum link] | Idea | Core / Standard / Informational | YYYY-MM-DD |
+| AZIP-X | [Title] | [Description (max 140 chars)] | [Author (@github)] | [GitHub Discussions link] | Draft | Core / Standard / Informational / Treasury | YYYY-MM-DD |
 
 ## Abstract
 
@@ -31,6 +31,10 @@
 ## Reference Implementation
 
 [Optional reference implementation.]
+
+## Treasury Considerations
+
+[Full economic analysis of long-term effects on network operators. Required for any proposals that mint new Aztec tokens or spend protocol controlled funds.]
 
 ## Security Considerations
 
