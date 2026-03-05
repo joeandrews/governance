@@ -14,12 +14,12 @@
 
 |  |  |
 | --- | --- |
-| `azip` | AZIP number (this is determined by the AZIP Editor when it is accepted as a Draft). |
+| `azip` | AZIP number, derived from the pull request number (e.g. PR #7 becomes AZIP-7). Numbers may not be sequential. |
 | `title` | The AZIP title is a few words, not a complete sentence. |
 | `description` | Description is one full (short) sentence. |
 | `author` | Comma separated list of the author's. Example: `FirstName LastName (@GitHubUsername)`, `FirstName LastName <foo@bar.com>` |
-| `discussions-to` | The URL pointing to the official discussion thread in GitHub Discussions on the AZIP repository. |
-| `status` | `Draft`, `RFD`, `Accepted`, or `Cancelled` |
+| `discussions-to` | The URL pointing to the AZIP's pull request on the AZIP repository. |
+| `status` | `Draft`, `RFD`, `Accepted`, `Rejected`, or `Cancelled` |
 | `category` | `Core`, `Treasury`, `Standard`, or `Informational` |
 | `created` | Date created on, in ISO 8601 (yyyy-mm-dd) format. |
 
@@ -50,7 +50,7 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 ### `discussions-to` header
 
-While an AZIP is a draft, a `discussions-to` header will indicate the URL where the AZIP is being discussed (in GitHub Discussions on the AZIP repository).
+While an AZIP is a draft, a `discussions-to` header will indicate the URL of the pull request where the AZIP is being reviewed and discussed.
 
 ## Abstract
 

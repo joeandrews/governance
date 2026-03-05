@@ -2,7 +2,7 @@
 
 | azip | title | description | author | discussions-to | status | category | created |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| AZIP-X | [Title] | [Description (max 140 chars)] | [Author (@github)] | [GitHub Discussions link] | Draft | Core / Standard / Informational / Treasury | YYYY-MM-DD |
+| AZIP-X | [Title] | [Description (max 140 chars)] | [Author (@github)] | [PR link] | Draft | Core / Standard / Informational / Treasury | YYYY-MM-DD |
 
 ## Abstract
 

@@ -40,8 +40,9 @@ TBD
 
 Anyone can propose changes to the Aztec Network by submitting an AZIP. To get started:
 
-1. Discuss your idea on the [Aztec forum](https://forum.aztec.network/)
+1. Post your idea in GitHub Discussions (under the "AZIP Ideas" category) to gather initial feedback
 2. Use the [AZIP Template](AZIPs/template.md) to draft your proposal
-3. Submit a pull request to this repository
+3. Open a pull request to this repository — an editor will assign a number and review begins
+4. Once peer review is complete, the PR is merged and the AZIP enters the repository
 
 See the [AZIP Process](azip-process.md) for the full lifecycle and requirements.
