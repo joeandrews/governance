@@ -4,13 +4,13 @@
 
 ## Preamble
 
-- *Headers containing metadata about the AZIP, including the AZIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include AZIP number. See below for details.*
+- *Headers containing metadata about the AZUP, including the AZUP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include the AZUP number. See below for details.*
 
 ### Header Format
 
 |  |  |
 | --- | --- |
-| `azup` | AZUP number (this is determined by the AZIP Editor when it is accepted as a Draft). |
+| `azup` | AZUP number (this is determined by the AZUP author when it is published). |
 | `title` | The AZUP title is a few words, not a complete sentence. |
 | `description` | Description is one full (short) sentence. |
 | `author` | Comma separated list of the author's. Example: `FirstName LastName (@GitHubUsername)`, `FirstName LastName <foo@bar.com>` |
@@ -23,7 +23,7 @@ Headers that permit lists must separate elements with commas. Headers requiring 
 
 ### `author` header
 
-The `author` header lists the names, email addresses or usernames of the authors/owners of the AZIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the `author` header value must be:
+The `author` header lists the names, email addresses or usernames of the authors/owners of the AZUP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the `author` header value must be:
 
 > Random J. User <address@dom.ain>
 >
@@ -46,11 +46,11 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 ### `discussions-to` header
 
-While an AZIP is a draft, a `discussions-to` header will indicate the URL where the AZIP is being discussed (in the [Aztec forum](https://discourse.aztec.network/)).
+While an AZUP is being discussed, the `discussions-to` header will indicate the URL where the AZUP is being discussed (in the [Aztec forum](https://discourse.aztec.network/)).
 
 ## Abstract
 
-- *Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.*
+- *Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable summary of what this upgrade does. Someone should be able to read only the abstract to get the gist of the proposal.*
 
 ## Motivation
 
@@ -101,10 +101,10 @@ While an AZIP is a draft, a `discussions-to` header will indicate the URL where 
 
 Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly. The exception is links to the [Aztec forum](https://forum.aztec.network/), which are permitted.
 
-## NOTE: Linking to other AZIPs
+## NOTE: Linking to other AZIPs and AZUPs
 
-References to other AZIPs should follow the format `AZIP-N` where `N` is the AZIP number you are referring to. Each AZIP that is referenced in an AZIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references. The link **MUST** always be done via relative paths so that the links work in the GitHub repository, forks of this repository, the main AZIPs site, mirrors of the main AZIP site, etc.
+References to AZIPs should follow the format `AZIP-N` and references to AZUPs should follow the format `AZUP-N`, where `N` is the number you are referring to. Each reference **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references. The link **MUST** always be done via relative paths so that the links work in the GitHub repository, forks of this repository, and mirrors.
 
 ## NOTE: Auxiliary Files
 
-Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that AZIP as follows: `assets/azip-N` (where **N** is to be replaced with the AZIP number). When linking to an image in the AZIP, use relative links such as `../assets/azip-1/image.png`.
+Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that AZUP as follows: `assets/azup-N` (where **N** is to be replaced with the AZUP number). When linking to an image in the AZUP, use relative links such as `../assets/azup-1/image.png`.

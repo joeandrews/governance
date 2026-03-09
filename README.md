@@ -9,7 +9,7 @@ Together, AZIPs and AZUPs form a structured pipeline for implementing changes wi
 
 ## What's an AZIP?
 
-AZIPs (AZtec Improvement Proposal) are a tool that can be used by anyone to propose informal changes, technical changes or to propose standards that can be used within the Aztec Network. AZIPs are version-controlled design documents that detail the motivation, technical specification, rationale, implementation path, and impact evaluation of proposed protocol-level, system-level, and application-level changes for the Aztec network, ranging from high-level informational context to core infrastructure updates and application standards. AZIPs are used to:
+AZIPs (AZtec Improvement Proposals) are version-controlled design documents that anyone can use to propose changes to the Aztec Network. AZIPs are used to:
 
 - Track progress while designing, building, and implementing new features
 - Publicly communicate new features, designs, and create space for community input
@@ -42,7 +42,7 @@ Anyone can propose changes to the Aztec Network by submitting an AZIP. To get st
 
 1. Post your idea in GitHub Discussions (under the "AZIP Ideas" category) to gather initial feedback
 2. Use the [AZIP Template](AZIPs/template.md) to draft your proposal
-3. Open a pull request to this repository — an editor will assign a number and review begins
+3. Open a pull request to this repository. An editor will assign a number and review begins
 4. Once peer review is complete, the PR is merged and the AZIP enters the repository
 
 See the [AZIP Process](azip-process.md) for the full lifecycle and requirements.

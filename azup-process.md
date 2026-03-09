@@ -1,14 +1,16 @@
 # AZUP Process
 
+*Note: AZIPs are improvement proposals (specifications). AZUPs are upgrade proposals (onchain execution).*
+
 ---
 
-The AZUP (AZtec Upgrade Proposals) process defines how protocol upgrades are proposed, evaluated, and adopted by the network. AZIPs approved for inclusion by Core Contributors are packaged into AZUPs - Aztec Upgrade Proposals. AZUPs are composed of on-chain “payloads” that sequencers signal support for. Payloads that meet the support quorum are promoted into formal proposals that tokenholders vote on. If approved, the upgrades are executed after built‑in safety delays.
-
-For proposed changes to be considered for signalling by sequencers and voting by token holders, it must be formally proposed via the AZUP process. This document provides an overview of that end‑to‑end process, focusing on the roles of key stakeholders and the lifecycle of a proposal.
+The AZUP (AZtec Upgrade Proposals) process defines how protocol upgrades are proposed, evaluated, and adopted by the network. AZIPs approved for inclusion by Core Contributors are packaged into AZUPs - Aztec Upgrade Proposals. Each AZUP is composed of a single onchain “payload” that sequencers signal support for. Payloads that meet the support quorum are promoted into formal proposals that tokenholders vote on. If approved, the upgrades are executed after built‑in safety delays.
 
 # Core Contributors
 
-The Core Contributors are a representative governance body that serves as the primary steward of the Aztec Network, providing a structured locus for review and coordination around proposed changes. Core Contributors are responsible for reviewing AZIPs, evaluating the implications of their design and implementations, and deciding which proposals should advance onchain to sequencers for signalling and to tokenholders for voting. Core Contributors are responsible for ensuring that AZIPs preserve coherence, security, and alignment with the network’s long‑term roadmap prior to network‑wide ratification.
+Once an AZIP reaches `RFD` status (see the [AZIP Process](azip-process.md)), it is submitted to Core Contributors for evaluation and potential inclusion in an AZUP.
+
+Core Contributors review AZIPs, evaluate their design and implementation implications, and decide which proposals advance onchain. They ensure AZIPs preserve coherence, security, and alignment with the network’s long-term roadmap. See the [Governance Manual](governance-manual.md) for full details on Core Contributor composition and responsibilities.
 
 ### Evaluation Criteria
 
@@ -16,7 +18,7 @@ The Core Contributors are a representative governance body that serves as the pr
 
 - The proposal has been thoroughly audited by a qualified team, with all reported issues of medium or higher severity either resolved or acknowledged.
 - The proposal has undergone comprehensive testing.
-- An operational plan, including automated testing and safety checks, is in place.
+- An operational plan, including automated testing and safety checks, is in place (e.g. automated fork tests verifying state transitions, canary deployments, and rollback procedures).
 - All known potential risks have been provably mitigated.
 
 **Strategic & Operational Considerations**
@@ -40,7 +42,7 @@ All representatives, including Founders, can be changed via an AZIP proposal put
 
 ### Core Contributor Weekly
 
-The Core Contributor Weekly is a call held once a week to discuss various initiatives involving the Aztec Network. Agendas can be found on the [Issues tab](https://github.com/AztecProtocol/governance/issues).
+The Core Contributor Weekly is a call held once a week to discuss various initiatives involving the Aztec Network. The facilitator creates a GitHub Issue for each weekly call as the agenda. Anyone can propose agenda items by commenting on the issue. Agendas can be found on the [Issues tab](https://github.com/AztecProtocol/governance/issues).
 
 If you would like to join these calls as an observer please contact the current facilitator.
 
@@ -51,29 +53,27 @@ If you would like to join these calls as an observer please contact the current 
 Core Contributors will be responsible for publishing AZUPs (using the AZUP Template) to the governance repository after they are scheduled for inclusion. These AZUPs should include:
 
 - List of approved AZIPs
-- Overview of payloads to be proposed
+- Overview of payload to be proposed
 - Scheduled date for deployment
 
 # Stages
 
 ## Proposing
 
-AZUPs bundle the implementations of one or more AZIPs that Core Contributors have approved for inclusion in the Aztec Network. Once an AZIP has been deemed properly specified, it is submitted by AZIP editors to the Core Contributors for final review. Core Contributors discuss AZIPs on a weekly basis during the Core Contributor Weekly call. AZIPs are bundled together by Core Contributors into AZUPs. AZUPs include:
+Once Core Contributors approve AZIPs for inclusion, they are bundled into an AZUP. Each AZUP includes:
 
 - List of AZIPs scheduled for inclusion
-- Payload(s) for any onchain changes
+- Payload for any onchain changes
 
-Core Contributors will publicly report on the outcome of their weekly meetings and provide evaluations for each AZIP. 
+### **Payload**
 
-### **Payloads**
+For each scheduled AZUP, Core Contributors deploy a payload contract on Ethereum mainnet that encodes the exact on‑chain changes (via functions such as ‎`getActions()`). The payload’s `getActions()` function describes the exact sequence of contract calls that will occur if governance approves the upgrade. The payload is the single source of truth for what an approved proposal will actually do on-chain. Once the payload is deployed and announced to the network, the AZUP is considered formally proposed and ready for sequencer signaling. Each payload must be merged into the AZIP repository in the `/AZUPs` folder and tagged with the corresponding AZIP/AZUP before deployment.
 
-For each scheduled AZUP, Core Contributors deploy one or more payload contracts on Ethereum mainnet that encode the exact on‑chain changes (via functions such as ‎`getActions()`). The payload’s `getActions()` function describes the exact sequence of contract calls that will occur if governance approves the upgrade. The payload is the single source of truth for what an approved proposal will actually do on-chain. Once the payloads are deployed and announced to the network, the AZUP is considered formally proposed and ready for sequencer signaling. Each payload must be merged into the AZIP repository in the `/AZUPs` folder and tagged with the corresponding AZIP/AZUP before deployment.
-
-Once payloads are deployed, Core Contributors publish a forum post following the AZUP Template. For more on how payloads are structured, see [sequencer documentation](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals).
+Once the payload is deployed, Core Contributors publish a forum post following the AZUP Template. For more on how payloads are structured, see [sequencer documentation](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals).
 
 ## Signalling
 
-After Core Contributors have approved an AZUP for inclusion, the deployed payload is sent to sequencers for **signalling**. The AZUP process uses a signaling phase to **gauge sequencer support** before a formal proposal is created. Signalling serves as an on-chain mechanism for sequencers to express coordinated support for a specific upgrade candidate. Sequencers signal support for payloads by configuring their nodes to include the payload address in block proposals. Each successful signal increments that payload’s support count for the current round.
+Signalling is an onchain mechanism for sequencers to express coordinated support for a specific upgrade candidate before a formal proposal is created. Sequencers signal support for payloads by configuring their nodes to signal for a specific payload address. A signal can be made for each slot that a sequencer is selected to propose block(s). Signaling is separate from block and checkpoint proposals. Each successful signal increments that payload’s support count for the current round.
 
 Sequencers are delegated through the Governance Staking Escrow (GSE) to the rollup contract by default, which automatically votes “yea” on AZUPs that came through the sequencer signaling path. Sequencers that want to vote “nay” or split their voting power must delegate away from the rollup to an address they control and vote directly via the GSE.
 
@@ -103,11 +103,12 @@ Following proposal creation, there is a **3‑day voting delay** in which the pr
 
 - Give the community time to review the payload and its implications.
 - Allow node operators to assess operational impact.
+- Allow tokenholders to stake and/or deposit into governance to participate in the upcoming vote. Staking (for running a sequencer) deposits tokens into governance by default and delegates voting power to the rollup (which always votes "yay"). Depositing into governance without staking allows tokenholders to vote directly.
 - Provide sequencers with an opportunity to adjust their delegation if they want to vote differently from the default rollup behavior.
 
 **Custom Voting via Delegation to a Controlled Address**
 
-During this time, any sequencer who would like to vote *without following the canonical rollup* (e.g. vote “nay”) must delegate their stake to an address they control. This removes their stake's voting power from the rollup's control and gives it to the chosen address.
+During this time, any sequencer who would like to vote *without following the canonical rollup* (i.e. vote “nay”) must delegate their stake to an address they control. This removes their stake's voting power from the rollup's control and gives it to the chosen address.
 
 See [Custom Voting](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals#custom-voting-delegating-to-your-own-address) for instructions on how to re-delegate stake.
 
@@ -129,9 +130,9 @@ By default, tokenholders staked as sequencers delegate their voting power to the
 
 A proposal is approved only if it satisfies all of the following:
 
-- **Quorum:** At least **100M tokens** must participate in the vote.
-- **Supermajority:** At least **66%** of the participating voting power in the proposal votes “yea.”
-- **Participation Floor:** An amount of voting power equivalent to at least **500 validators** participates, ensuring a broad enough security base.
+- **Quorum:** At least **20%** of the total voting power in governance must participate.
+- **Supermajority:** The difference between yea and nay votes must be at least **33%**, meaning at least **66%** of votes cast must be yea.
+- **Minimum Votes:** At least **100,000,000 tokens** must be deposited in governance for any vote to pass.
 
 If these thresholds are not met, the proposal fails and does not proceed to execution.
 
@@ -201,4 +202,6 @@ Sequencers stake into a rollup contract. By default, a sequencer’s voting powe
 
 This default delegation path provides a straightforward way for sequencers to participate in governance without managing votes directly, while still retaining the option to override via custom delegation.
 
-AZUP Template
+## Resources
+
+[AZUP Template](./AZUPs/template.md)

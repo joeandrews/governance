@@ -2,14 +2,14 @@
 
 # Background
 
-The Aztec Network is a fully decentralised L2 on top of Ethereum. A decentralized network must be made up of a permissionless network of operators who run the network and decide on upgrades. Aztec is run by a decentralized network of node operators who propose and attest to transactions. Rollup proofs on Aztec are also run by a decentralized prover network that can permissionlessly submit proofs and participate in block rewards. Finally, the Aztec network is governed by the sequencers, who propose, signal, vote, and execute network upgrades.
+The Aztec Network is a fully decentralized L2 on top of Ethereum, run by a permissionless network of sequencers who propose and attest to transactions, and provers who submit rollup proofs. Sequencers also serve as core governance actors, proposing, signaling, voting on, and executing network upgrades.
 
 The purpose of Aztec governance is to remove control over the network from the hands of any single entity or individual. Decentralized sequencing, proving, and governance are hard‑coded into the base protocol so that no central actor can unilaterally change the rules, censor transactions, or appropriate user value. Multi-stakeholder governance reduces platform risk, improves capture‑resistance, and gives builders and users credible assurances that the network will not turn against them as it grows. By distributing upgrade authority across sequencers and tokenholders and grounding all decisions in open, transparent processes (AZIPs and AZUPs), Aztec aims to align long‑term protocol stewardship with the people who depend on it, while still enabling efficient, scalable decision‑making about upgrades, parameters, and resources.
 
 # Governance Components
 
 - **AZIPs** – Off‑chain, version‑controlled design documents that specify proposed changes to Aztec’s protocols, standards, or governance processes, serving as the canonical record of what should change and why.
-- **AZUPs** – Onchain upgrade bundles that package one or more AZIPs, plus their associated payloads, into a concrete proposal for execution on the Aztec Network.
+- **AZUPs** – Onchain upgrade bundles that package one or more AZIPs, plus their associated payload, into a concrete proposal for execution on the Aztec Network.
 - **Payloads** – Series of onchain commands that execute against protocol contracts (or update contract references) detailed by an approved AZUP.
 - **Signalling** – The process by which sequencers express support for an AZUP’s payload onchain; once a payload receives signals in at least 600 of 1,000 eligible block slots, it is promoted to a formal onchain proposal.
 - **Onchain Proposals** – Governance objects created once a payload meets sequencer signaling thresholds, defining a specific upgrade that tokenholders can vote to accept or reject.
@@ -53,7 +53,7 @@ Currently, the Core Contributors are composed of the following representatives:
 
 Tokenholders play a direct role in Aztec governance by staking their tokens and participating in onchain votes. Any tokenholder may participate in governance votes by connecting their wallet to the governance dashboard, staking into the Token Vault, and locking tokens for at least 15 days to ensure proposals can be executed before they exit. 
 
-Once a proposal is created by sequencers, all eligible Token Vault holders can vote during a 7‑day voting window, following a fixed timeline that includes an initial waiting period, a voting period, an execution delay, and a final grace period for execution. For a proposal to pass, at least 100 million tokens must participate in the vote, a minimum of 66% of the votes cast must be in favor, and voting power equivalent to at least 500 validators must participate to ensure a broad enough security base.
+Once a proposal is created by sequencers, all eligible Token Vault holders can vote during a 7‑day voting window, following a fixed timeline that includes an initial waiting period, a voting period, an execution delay, and a final grace period for execution. For a proposal to pass, at least 20% of the total voting power in governance must participate, at least 66% of votes cast must be in favor, and at least 100,000,000 tokens must be deposited in governance.
 
 Aztec Labs and Aztec Foundation teams, as well as investors, are excluded from staking and governance for the first 12 months (including the TGE vote), with their tokens locked for 1 year and then vesting over the following 2 years. 
 
@@ -61,7 +61,7 @@ Aztec Labs and Aztec Foundation teams, as well as investors, are excluded from s
 
 ## AZIPs
 
-AZIPs (AZtec Improvement Proposal) are a tool that can be used by anyone to propose informal changes, technical changes or to propose standards that can be used within the Aztec Network. AZIPs are version-controlled design documents that detail the motivation, technical specification, rationale, implementation path, and impact evaluation of proposed protocol-level, system-level, and application-level changes for the Aztec network, ranging from high-level informational context to core infrastructure updates and application standards. AZIPs are used to:
+AZIPs (AZtec Improvement Proposals) are version-controlled design documents that anyone can use to propose changes to the Aztec Network. AZIPs are used to:
 
 - Track progress while designing, building, and implementing new features
 - Publicly communicate new features, designs, and create space for community input

@@ -20,7 +20,7 @@
 | `author` | Comma separated list of the author's. Example: `FirstName LastName (@GitHubUsername)`, `FirstName LastName <foo@bar.com>` |
 | `discussions-to` | The URL pointing to the AZIP's pull request on the AZIP repository. |
 | `status` | `Draft`, `RFD`, `Accepted`, `Rejected`, or `Cancelled` |
-| `category` | `Core`, `Treasury`, `Standard`, or `Informational` |
+| `category` | `Core`, `Economics`, `Standard`, or `Informational` |
 | `created` | Date created on, in ISO 8601 (yyyy-mm-dd) format. |
 
 Headers that permit lists must separate elements with commas. Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
@@ -80,9 +80,9 @@ While an AZIP is a draft, a `discussions-to` header will indicate the URL of the
 
 - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all AZIPs.
 
-## **Treasury Considerations** (required for any proposals that mint new Aztec tokens or spend protocol controlled funds):
+## **Economics Considerations** (required for `Economics` AZIPs):
 
-- *All proposals that spend protocol funds should include a full economic analysis of the long-term effects on sequencing and proving the network for operators. Proposals that request funds from the treasury must clearly detail where the funds will go and how they will be spent. Any funds going to smart contracts must meet the Security Considerations below.*
+- *All proposals that change economic parameters or spend protocol funds should include a full economic analysis of the long-term effects on sequencing and proving the network for operators. Proposals that request funds from the treasury must clearly detail where the funds will go and how they will be spent. Any funds going to smart contracts must meet the Security Considerations below.*
 
 ## **Security Considerations** (required for `Core` and `Standard` AZIPs):
 

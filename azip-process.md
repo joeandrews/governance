@@ -2,15 +2,15 @@
 
 ## Abstract
 
-The AZIP (Aztec Improvement Proposal) process is the standard process for specifying, discussing, and proposing changes to the Aztec network. AZIPs are version-controlled design documents that detail the motivation, technical specification, rationale, implementation path, and impact evaluation of proposed protocol-level, system-level, and application-level changes for the Aztec network, ranging from high-level informational context to core infrastructure updates and application standards. AZIPs are maintained in a dedicated, version-controlled GitHub repository, which serves as the canonical record of all active, implemented, and archived AZIPs. When relevant, AZIPs include concise technical specifications, and the author is responsible for building community consensus and documenting any dissenting views. This document defines the AZIP lifecycle, required structure, categories, and editorial workflow that govern how proposals are authored, reviewed, standardized, and recorded.
+The AZIP (Aztec Improvement Proposal) process is how changes to the Aztec network are proposed, reviewed, and recorded. AZIPs are version-controlled design documents maintained in a dedicated GitHub repository, which serves as the canonical record of all proposals. This document defines the AZIP lifecycle, required structure, categories, and editorial workflow.
 
 ## Rationale
 
-AZIPs are intended to be the canonical way to propose and coordinate changes to the Aztec network, replacing ad‑hoc discussions with a structured, transparent process. By requiring proposals to be captured as version‑controlled design documents, AZIPs create a public and auditable record of motivations, design iterations, community feedback and implementation details of every proposed change to the Aztec network, documenting the full lifecycle of how a change is evaluated, refined, and ultimately adopted or rejected. This shared format gives contributors a common language for evaluating ideas, helps implementers track which features their software supports, and provides users with a clear view of the current and planned behavior of the network. The AZIP framework is deliberately modeled on the well‑tested [EIP](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md) and [BIP](https://bips.dev/) processes, adapted to Aztec’s architecture and governance needs to give the ecosystem a battle‑tested and predictable process that brings proposals from idea to implementation.
+AZIPs replace ad-hoc discussions with a structured, transparent process. By capturing proposals as version-controlled documents, AZIPs create a public record of motivations, design iterations, and community feedback for every proposed change. The framework is modeled on the [EIP](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md) and [BIP](https://bips.dev/) processes, adapted to Aztec’s governance needs.
 
 ## Scope
 
-AZIPs are design documents that detail the motivation, technical specification, rationale, implementation path, and impact evaluation of proposed protocol-level, system-level, and application-level changes for the Aztec network, ranging from high-level informational context to core infrastructure updates and application standards. AZIPs are used to:
+AZIPs are used to:
 
 - Track progress while designing, building, and implementing new features
 - Publicly communicate new features, designs, and create space for community input
@@ -19,47 +19,38 @@ AZIPs are design documents that detail the motivation, technical specification, 
 All AZIPs must be grouped into one of the following categories:
 
 1. **Core** - Core System AZIPs, including improvements to the protocol specifications for public, private, sequencer and prover components, and networking protocols.
-2. **Treasury** - Requesting funds from the governance treasury or minting more $AZTEC tokens. Grant requests are not entertained as part of this process.
+2. **Economics** - Changes to the economic parameters of the protocol, including gas values, block rewards, fee splits, and the use of the protocol treasury. This includes requests to spend treasury funds or mint $AZTEC tokens. Compensation requests for governance roles (e.g. council members) are in scope. General grant requests are not entertained as part of this process.
 3. **Standard** - Application layer AZIPs, e.g. defining standards for contracts written in Noir or a token standard etc. A separate standards process may be defined in the future.
 4. **Informational** - Provide general guidelines or information to the Aztec community, but does not propose a new feature. Includes high level descriptions of the system, architecture, etc.
+
+**What doesn't need an AZIP:** Changes that don't affect the protocol specification or standards do not require an AZIP. Examples include node software optimizations, new RPC endpoints, internal refactors, client UX improvements, or bug fixes that don't alter protocol behavior.
 
 AZIPs that require onchain implementation are bundled into AZUPs by Core Contributors and submitted to Sequencers & Tokenholders for voting. See the AZUP process for more details. 
 
 ### **Process**
 
-Each AZIP progresses through a defined set of stages that govern how it is proposed, reviewed, finalized, and, where applicable, implemented onchain. 
+Before entering the formal process, proposals start as posts in GitHub Discussions. Once an author opens a PR, the AZIP enters the formal lifecycle:
 
-All AZIPs start as informal ideas discussed in GitHub Discussions on the AZIP repository. Once properly specified, they are submitted as pull requests to the official AZIP GitHub repository. The PR serves as the primary venue for technical review and feedback. Once review is complete, the PR is merged and the AZIP becomes part of the canonical record. From there, an AZIP progresses through the following stages:
-
-1. `Idea`: Proposal is in pre‑draft concept form and being discussed in GitHub Discussions on the AZIP repository. AZIPs in `Idea` stage are not tracked in the AZIP repository.
-    - Criteria:
-        - Post in GitHub Discussions (under the "AZIP Ideas" category)
-        - Gather initial feedback from the community
-2. `Draft`: Author opens a pull request with a fully specified AZIP. The PR remains open for peer review. An editor assigns an AZIP number and reviews formatting. All technical discussion and peer review happens in PR comments.
-    - Criteria:
-        - All fields in AZIP template are completed (no TBDs)
-        - Full specification draft, including technical implementation
-    - Process:
-        - Author opens a PR with the complete AZIP
+1. `Draft`: Author opens a pull request with a fully specified AZIP.
+    - Steps:
+        - Author opens a PR with the complete AZIP (all template fields completed, no TBDs)
         - The AZIP number is derived from the PR number (e.g. PR #7 becomes AZIP-7)
-        - An editor reviews formatting and confirms the number
-        - The PR remains open for peer review — all feedback happens in PR comments
-3. `RFD (Ready for Discussion)`: Peer review is complete and the PR is merged into the repository. The AZIP now represents the final standard; only minor errata or non‑normative clarifications may be added. Core Contributors review the AZIP for AZUP inclusion.
-    - Criteria:
+        - An editor reviews the AZIP for formatting, language, markup, technical soundness, and confirms the number
+        - The PR remains open for peer review. All feedback happens in PR comments
+2. `RFD (Ready for Discussion)`: The PR is merged into the repository. Core Contributors review the AZIP for AZUP inclusion.
+    - Steps:
+        - While the PR is open, editors and authors socialize the AZIP with impacted stakeholders. Authors update the AZIP based on feedback received
         - Peer review has been completed and documented in the PR, with provable engagement from impacted stakeholders
         - Security Considerations discussion deemed sufficient by the reviewers (for `Core` and `Standard` AZIPs)
-    - Process:
         - An editor reviews the PR and associated discussion to verify sufficient peer review
-        - The PR is merged — the AZIP is now in the repository
-4. `Accepted`: AZIP has been accepted and implemented onchain via an AZUP (if applicable).
-5. `Rejected`: Core Contributors have reviewed the AZIP and decided not to progress it for implementation. The rejection rationale must be documented by Core Contributors. A rejected AZIP remains in the repository as a permanent record. If the idea is pursued at a later date with a substantially different approach, it requires a new AZIP number referencing the original.
-6. `Cancelled`: The AZIP author(s) or editors have withdrawn the proposed AZIP. An AZIP may be cancelled at any point after it has entered `Draft`. If the idea is pursued at a later date it is considered a new proposal.
+        - The editor merges the PR. The AZIP is now in the repository as the canonical record
+3. `Accepted`: AZIP has been accepted and implemented onchain via an AZUP (if applicable).
+4. `Rejected`: Core Contributors have reviewed the AZIP and decided not to progress it for implementation. The rejection rationale must be documented by Core Contributors. A rejected AZIP remains in the repository as a permanent record. If the idea is pursued at a later date with a substantially different approach, it requires a new AZIP number referencing the original.
+5. `Cancelled`: The AZIP author(s) or editors have withdrawn the proposed AZIP. An AZIP may be cancelled at any point after it has entered `Draft`. If the idea is pursued at a later date it is considered a new proposal.
 
-If an existing implementation does not conform to the specification as described in an accepted AZIP, the implementation may be corrected without a new AZIP. AZIPs govern the specification, not the implementation — fixes that bring code in line with an existing spec are not considered protocol changes.
+AZIPs govern the specification, not the implementation. If an existing implementation does not conform to the spec, it may be corrected without a new AZIP.
 
-An AZIP's status does not enforce when development must begin. For example, work may start as early as the Draft stage, but remain heavily subject to change. Aztec engineers building reference implementations may begin before an AZIP reaches `RFD` status, but external developers working on their own implementations will likely wait for `RFD` or `Accepted` status.
-
-Throughout the process, the proposal author(s) works to build community consensus, collect technical feedback, and, where needed, provide reference implementations. Because AZIPs are version-controlled files, their history serves as the permanent record of design decisions, and they act as the primary coordination mechanism for proposal authors and the wider community. AZIP editors are responsible for moving proposals from stage to stage, ensuring each AZIP meets the set criteria required to progress through the AZIP process.
+An AZIP's status does not enforce when development must begin. Work may start as early as Draft, but remains subject to change until the AZIP reaches `RFD` or `Accepted`.
 
 ## Content Requirements
 
@@ -83,8 +74,8 @@ Each AZIP should have the following parts:
     - Tests should either be inlined in the AZIP as data (such as input/expected output pairs, or included in `../assets/azip-###/<filename>`.
 - **Reference Implementation** (optional)
     - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all AZIPs.
-- **Treasury Considerations** (required for any proposals that mint new Aztec tokens or spend protocol controlled funds):
-    - All proposals that spend protocol funds should include a full economic analysis of the long-term effects on sequencing and proving the network for operators. Proposals that request funds from the treasury must clearly detail where the funds will go and how they will be spent. Any funds going to smart contracts must meet the Security Considerations below.
+- **Economics Considerations** (required for `Economics` AZIPs):
+    - All proposals that change economic parameters or spend protocol funds should include a full economic analysis of the long-term effects on sequencing and proving the network for operators. Proposals that request funds from the treasury must clearly detail where the funds will go and how they will be spent. Any funds going to smart contracts must meet the Security Considerations below.
 - **Security Considerations** (required for `Core` and `Standard` AZIPs):
     - All `Core` and `Standard` AZIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. AZIP submissions missing the “Security Considerations” section will be rejected. An AZIP cannot proceed to status `RFD` without a Security Considerations discussion deemed sufficient by the reviewers.
 - **Copyright Waiver:**
@@ -110,39 +101,7 @@ TBD
 
 Many AZIPs are written and maintained by developers with write access to the Aztec codebase. The AZIP editors continuously monitor AZIP changes, and correct any structure, grammar, spelling, or markup mistakes.
 
-### Responsibilities
-
-AZIP editors are meant to be *administrators* vs. *decision-makers*. They are required to raise AZIPs up to Core Contributors regardless of their subjective views on the contents of those proposals. Their role should be to ensure that each AZIP is properly formatted, discussed, and meets the following criteria at each stage but not act as a subjective gatekeeper:
-
-**`Idea -> Draft`**
-
-When an author opens a PR with a new AZIP, an editor reads the AZIP to check if it meets the following requirements:
-
-- All fields in AZIP template are completed (no TBDs)
-- Title accurately describes content
-- Full specification is drafted, including technical implementation
-- Has been checked for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style
-- The proposal is technically sound and coherent, even when its likelihood of reaching RFD status is unknown
-
-If the AZIP does not meet the requirements, the editor will comment on the PR requesting changes with specific instructions.
-
-Once the AZIP meets the requirements, the editor will:
-
-- Confirm the AZIP number (derived from the PR number)
-- Update AZIP header to `Draft`
-- Leave the PR open for peer review
-
-**`Draft -> RFD (Ready for Discussion)`**
-
-While a PR is open in `Draft` status, AZIP editors and proposal authors are responsible for socializing the AZIP with impacted stakeholders for peer review. All technical discussion and feedback happens in PR comments. Authors should update the AZIP in the PR based on feedback received.
-
-Once an editor determines that sufficient peer review has been completed, they review the PR and associated discussion to verify:
-
-- Peer review has been completed and documented in the PR, with provable engagement from impacted stakeholders
-- Changes to the design and specification are technically sound and aligned with stakeholder feedback. If feedback is not incorporated, the proposal must include a clear justification.
-- Specification is considered final, with only minor errata or non‑normative clarifications allowed thereafter.
-
-The editor then merges the PR, which transitions the AZIP to `RFD` status and adds it to the repository as the canonical record.
+AZIP editors are *administrators*, not *decision-makers*. They are required to raise AZIPs up to Core Contributors regardless of their subjective views on the contents of those proposals. Their role is to ensure that each AZIP is properly formatted, discussed, and meets the criteria at each stage, but not to act as a subjective gatekeeper. If an AZIP does not meet the requirements, the editor will comment on the PR requesting changes with specific instructions.
 
 Read more about the Core Contributors in the [AZUP Process](azup-process.md).
 
@@ -158,4 +117,4 @@ Copyright and related rights waived via CC0.
 
 ## Resources
 
-AZIP Template
+[AZIP Template](./AZIPs/template.md)
