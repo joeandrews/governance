@@ -4,19 +4,18 @@
 
 ## Preamble
 
-- *Headers containing metadata about the AZUP, including the AZUP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include the AZUP number. See below for details.*
+- *Headers containing metadata about the AZUP, including the AZUP number, a short descriptive title (limited to a maximum of 80 characters), a description (limited to a maximum of 140 characters), and the author details. The title and description should not include the AZUP number. See below for details.*
 
 ### Header Format
 
 |  |  |
 | --- | --- |
-| `azup` | AZUP number (this is determined by the AZUP author when it is published). |
+| `azup` | AZUP number, assigned by an editor upon submission. Numbers are sequential. |
 | `title` | The AZUP title is a few words, not a complete sentence. |
 | `description` | Description is one full (short) sentence. |
-| `author` | Comma separated list of the author's. Example: `FirstName LastName (@GitHubUsername)`, `FirstName LastName <foo@bar.com>` |
+| `author` | Comma-separated list of the authors. Example: `FirstName LastName (@GitHubUsername)`, `FirstName LastName <foo@bar.com>` |
 | `azips-included` | URLs pointing to included AZIPs in GitHub |
-| `discussions-to` | The URL pointing to the official discussion thread in the [Aztec forum](https://discourse.aztec.network/). |
-| `status` | `Scheduled` `Deployed` |
+| `discussions-to` | The URL pointing to the AZUP's GitHub Discussions thread. |
 | `created` | Date created on, in ISO 8601 (yyyy-mm-dd) format. |
 
 Headers that permit lists must separate elements with commas. Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
@@ -33,20 +32,23 @@ or
 > Random J. User (@username)
 >
 
+or both, comma-separated:
+
+> Random J. User (@username, address@dom.ain)
+>
+
 if the email address or GitHub username is included, and
 
 > Random J. User
 >
 
-if the email address is not given.
-
-It is not possible to use both an email and a GitHub username at the same time. If important to include both, one could include their name twice, once with the GitHub username, and once with the email.
+if neither is given.
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
 ### `discussions-to` header
 
-While an AZUP is being discussed, the `discussions-to` header will indicate the URL where the AZUP is being discussed (in the [Aztec forum](https://discourse.aztec.network/)).
+The `discussions-to` header will indicate the URL of the GitHub Discussions thread where the AZUP is being discussed.
 
 ## Abstract
 
@@ -67,9 +69,9 @@ While an AZUP is being discussed, the `discussions-to` header will indicate the 
 | **Contract / Module** | `[path/to/ContractOrModule.sol]` |
 | **Explorer** | `[Verified Contract / Explorer link]` |
 
-### 2. Sequencer Configuration (for signalling)
+### 2. Sequencer Configuration (for signaling)
 
-- *Add environment variable for sequencers to set the payload address for signalling. Include a short explanation.*
+- *Add environment variable for sequencers to set the payload address for signaling. Include a short explanation.*
 
 ## Impact Evaluation
 
@@ -88,7 +90,7 @@ While an AZUP is being discussed, the `discussions-to` header will indicate the 
 | Proposal Created | [FILL IN] | [Timing relative to signaling] | — |
 | Proposal Delay | [FILL IN] | 3 days |  |
 | Voting Period | [FILL IN] | 7 days | — |
-| Execution Delay | [FILL IN] | 7 days | — |
+| Execution Delay | [FILL IN] | 30 days | — |
 | **Earliest Possible Execution** | [FILL IN] | — | **[Date and time in UTC, if known]** |
 
 *Note: The actual execution date depends on when signaling quorum is reached (if relevant), the proposal passes, and execution occurs.*
@@ -99,7 +101,7 @@ While an AZUP is being discussed, the `discussions-to` header will indicate the 
 
 ## NOTE: Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly. The exception is links to the [Aztec forum](https://forum.aztec.network/), which are permitted.
+Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly. Exceptions are links to the [Aztec forum](https://forum.aztec.network/) and resources within the [governance repository](https://github.com/AztecProtocol/governance), which are permitted.
 
 ## NOTE: Linking to other AZIPs and AZUPs
 
