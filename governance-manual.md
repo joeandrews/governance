@@ -35,7 +35,7 @@ Core Contributors are individuals who actively and meaningfully contribute to th
 
 The Core Contributor Weekly is a call held once a week to discuss various initiatives involving the Aztec Network. The facilitator creates a GitHub Issue for each weekly call as the agenda. Anyone can propose agenda items by commenting on the issue. Agendas can be found on the [Issues tab](https://github.com/AztecProtocol/governance/issues).
 
-If you would like to join these calls as an observer please contact the current facilitator.
+If you would like to join the governance process and participate in the calls, join the [Aztec Governance Signal group](https://signal.group/#CjQKIMpN-zgok2fW3PQQlv8PovOvHl47t8_P8dUpN1_SvMBpEhC6zgiyP2IiI6cbQtsN6dle).
 
 *Facilitator* → [Koen van Marrewijk](https://github.com/koenmtb1) (Mar ‘26) [koen@aztec.foundation](mailto:koen@aztec.foundation)
 
@@ -81,4 +81,32 @@ flowchart LR
     I --> K["Execution\n(Grace Period)"]
     K --> L["Upgrade Live"]
 ```
+
+## Disputes and Disagreements
+
+Disagreements are a natural part of governance. The AZIP and AZUP processes are designed to surface conflicts early and resolve them through transparent, structured mechanisms.
+
+### Decision-Making in Core Contributor Calls
+
+Core Contributors make decisions using rough consensus. If no significant objections remain after discussion, the proposal moves forward. When consensus cannot be reached, the facilitator may call a simple majority vote among participants present, recorded in the call notes. Decisions with significant impact should be deferred if key stakeholders are absent or discussion is unresolved. Disagreements may be revisited at a subsequent call if new information or arguments are brought forward.
+
+### AZIP Disputes
+
+AZIP editors are administrators, not decision-makers. They may not block proposals on substantive grounds. Substantive disagreements are resolved by Core Contributors during RFD review. When contributors fundamentally disagree on direction, they are encouraged to submit competing AZIPs. Rejected AZIPs cannot be reopened; a new AZIP must be submitted that references the original and explains what has changed.
+
+### AZUP Disputes
+
+If an AZUP fails signaling or voting, Core Contributors should engage with opposing stakeholders. A failed AZUP cannot be resubmitted. A new AZUP must address the feedback received.
+
+The governance process provides multiple checkpoints for opposition: sequencers can withhold signals, tokenholders and sequencers can vote "nay" or re-delegate before the snapshot, and proposals that are not executed within the grace period expire. No single party can unilaterally force or block an upgrade.
+
+### Undocumented Payloads
+
+The governance process requires that all protocol upgrades follow the full AZIP and AZUP lifecycle before being submitted for sequencer signaling. Payloads that have not been reviewed by Core Contributors, documented as an AZUP, and published to the governance repository are not considered legitimate upgrade candidates. Sequencers who signal for undocumented or unreviewed payloads undermine the integrity of the governance process. If such a payload reaches signaling quorum and is promoted to a proposal, tokenholders are expected to vote "nay" and Core Contributors should publicly flag the proposal as having bypassed the established process. The governance framework exists to ensure that upgrades are transparent, well-reviewed, and broadly supported before reaching the network.
+
+### General Principles
+
+- Disputes should be conducted publicly in GitHub PRs, Discussions, or the Aztec forum.
+- Decisions that reject or block a proposal must include documented rationale.
+- The governance process, not any individual or group, is the final arbiter.
 
