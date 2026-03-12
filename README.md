@@ -28,7 +28,7 @@ For the full process, see the [AZUP Process](azup-process.md). To start drafting
 
 AZIP editors verify that proposals meet the criteria required to progress through the [AZIP Process](azip-process.md). Authors drive their own proposals through the process; editors are administrators, not decision-makers.
 
-TBD
+- [Josh Crites](https://github.com/critesjosh) [josh@aztec-labs.com](mailto:josh@aztec-labs.com)
 
 ## Contributing
 

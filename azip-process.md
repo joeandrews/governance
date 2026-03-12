@@ -116,7 +116,7 @@ AZIP editors verify that proposals meet the criteria required to progress throug
 
 The current AZIP editors are:
 
-TBD
+- [Josh Crites](https://github.com/critesjosh) [josh@aztec-labs.com](mailto:josh@aztec-labs.com)
 
 Many AZIPs are written and maintained by developers with write access to the Aztec codebase. The AZIP editors continuously monitor AZIP changes, and correct any structure, grammar, spelling, or markup mistakes.
 
