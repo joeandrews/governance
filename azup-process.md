@@ -53,13 +53,15 @@ Once the payload is deployed, Core Contributors publish a forum post following t
 
 Signaling is an onchain mechanism for sequencers to express coordinated support for a specific upgrade candidate before a formal proposal is created. Sequencers signal support for payloads by configuring their nodes to signal for a specific payload address. A signal can be made for each slot that a sequencer is selected to propose checkpoints. Signaling is separate from checkpoint proposals. Each successful signal increments that payload's support count for the current round.
 
-A payload reaches signaling quorum when it accumulates at least **600 signals within a 1,000-slot round** (60% of the round's total possible signals). Payloads that meet this threshold are eligible to be promoted into formal proposals. Once a payload reaches quorum, it must be promoted to a formal proposal within 5 rounds (`LIFETIME_IN_ROUNDS` in `GovernanceProposer.sol`). If not promoted in time, the quorum expires and signals must be gathered again.
+A payload reaches signaling quorum when it accumulates at least **`QUORUM_SIZE` signals within a `ROUND_SIZE`-slot round** (`GovernanceProposer.sol`). Payloads that meet this threshold are eligible to be promoted into formal proposals. Once a payload reaches quorum, it must be promoted to a formal proposal within `LIFETIME_IN_ROUNDS` (`GovernanceProposer.sol`). If not promoted in time, the quorum expires and signals must be gathered again.
 
 For more on how signaling works, see [sequencer documentation](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals).
 
 ### Alternative Proposal Path
 
-In addition to the sequencer signaling path, the Governance contract supports an alternative proposal mechanism that bypasses sequencer signaling. This path requires the proposer to lock a significant amount of tokens for an extended period. Once submitted, the proposal follows the same voting and execution process as any other proposal. This mechanism exists as a safeguard in case sequencer signaling is unable to function as intended.
+In addition to the sequencer signaling path, the Governance contract supports an alternative proposal mechanism (`proposeWithLock`) that bypasses sequencer signaling. This path requires the proposer to lock `proposeConfig.lockAmount` tokens for `proposeConfig.lockDelay` (both from `getConfiguration()` in `Governance.sol`). Once submitted, the proposal follows the same voting and execution process as any other proposal. This mechanism exists as a safeguard in case sequencer signaling is unable to function as intended.
+
+The rollup does **not** automatically vote "yea" on proposals submitted via `proposeWithLock`. Sequencers and tokenholders must actively vote to pass these proposals.
 
 ## Voting
 
@@ -79,11 +81,11 @@ At this point, the payload transitions from a “signaled upgrade candidate” t
 
 ### Preparing for the Vote
 
-Following proposal creation, there is a **3-day voting delay** in which the proposal is pending and votes cannot yet be cast. This delay is designed to:
+Following proposal creation, there is a **`votingDelay`** period in which the proposal is pending and votes cannot yet be cast. This delay is designed to:
 
 - Give the community time to review the payload and its implications.
 - Allow node operators to assess operational impact.
-- Allow tokenholders to stake and/or deposit into governance to participate in the upcoming vote. Staking (for running a sequencer) deposits tokens into governance by default and delegates voting power to the rollup (which always votes "yea"). Depositing into governance without staking allows tokenholders to vote directly.
+- Allow tokenholders to stake and/or deposit into governance to participate in the upcoming vote. Staking (for running a sequencer) deposits tokens into governance by default and delegates voting power to the rollup (which automatically votes "yea" on proposals from the `GovernanceProposer`). Depositing into governance without staking allows tokenholders to vote directly.
 - Provide sequencers with an opportunity to adjust their delegation if they want to vote differently from the default rollup behavior.
 
 **Custom Voting via Delegation to a Controlled Address**
@@ -94,13 +96,13 @@ See [Custom Voting](https://docs.aztec.network/network/operation/sequencer_manag
 
 ### Voting
 
-After the waiting period expires, the proposal enters a 7-day voting period. At the moment voting begins:
+After the waiting period expires, the proposal enters the `votingDuration` voting period. At the moment voting begins:
 
 - The system snapshots voting power derived from staked tokens.
 - The delegation state at that time determines who holds voting rights for the proposal.
 - Any delegation changes made *after* voting has started do not affect voting power for that active proposal.
 
-To participate in voting, eligible tokenholders can stake and lock their tokens to vote. All staked tokens will be locked for at least 38 days to ensure the proposal can be executed before the voter exits.
+To participate in voting, eligible tokenholders can stake and lock their tokens to vote. All staked tokens will be locked for the minimum lock period (`votingDelay + votingDuration + executionDelay` from `getConfiguration()` in `Governance.sol`) to ensure the proposal can be executed before the voter exits.
 
 **Default Voting via Rollup Delegation**
 
@@ -112,15 +114,17 @@ By default, tokenholders staked as sequencers delegate their voting power to the
 
 A proposal is approved only if it satisfies all of the following:
 
-- **Quorum:** At least **20%** of the total voting power in governance must participate.
-- **Supermajority:** The difference between yea and nay votes must be at least **33%**, meaning at least **66%** of votes cast must be yea.
-- **Minimum Votes:** At least **100,000,000 tokens** must be deposited in governance for any vote to pass.
+- **Quorum:** At least **`quorum`** of the total voting power in governance must participate.
+- **Supermajority:** The difference between yea and nay votes must meet the **`requiredYeaMargin`** threshold.
+- **Minimum Votes:** At least **`minimumVotes`** tokens must be deposited in governance for any vote to pass.
+
+*(All fields from `getConfiguration()` in `Governance.sol`)*
 
 If these thresholds are not met, the proposal fails and does not proceed to execution.
 
 ### Execution
 
-When a proposal receives sufficient support, it passes. After passing, there's another mandatory 30-day delay before the proposal becomes executable. 
+When a proposal receives sufficient support, it passes. After passing, there's another mandatory `executionDelay` (`getConfiguration()` in `Governance.sol`) before the proposal becomes executable. 
 
 This delay serves several purposes:
 
@@ -130,7 +134,7 @@ This delay serves several purposes:
 
 In practice, operators may run multiple node versions during this window (for example, one on the current version and one on the upcoming version) to ensure a smooth transition.
 
-Once executable, anyone can trigger execution. See [Executing Proposals](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals#executing-proposals) for instructions on how to execute proposals. If not executed within the grace period (`getGracePeriod()` in `Governance.sol`), the proposal expires.
+Once executable, anyone can trigger execution. See [Executing Proposals](https://docs.aztec.network/network/operation/sequencer_management/creating_and_voting_on_proposals#executing-proposals) for instructions on how to execute proposals. If not executed within the `gracePeriod` (`getConfiguration()` in `Governance.sol`), the proposal expires.
 
 ### Failed Proposals
 

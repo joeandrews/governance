@@ -81,20 +81,6 @@ The `discussions-to` header will indicate the URL of the GitHub Discussions thre
 
 - *Discuss security implications, potential risks, and how they are being addressed. Include links to the relevant code repository, key contracts or modules, and any verified deployments on explorers so reviewers can inspect the logic themselves.*
 
-## Implementation Timeline
-
-| Phase | Start Date | Estimated Duration | Target / Notes |
-| --- | --- | --- | --- |
-| Community Discussion | [FILL IN] | 3 days | — |
-| Signaling  | [FILL IN] | -  | [Quorum or condition] |
-| Proposal Created | [FILL IN] | [Timing relative to signaling] | — |
-| Proposal Delay | [FILL IN] | 3 days |  |
-| Voting Period | [FILL IN] | 7 days | — |
-| Execution Delay | [FILL IN] | 30 days | — |
-| **Earliest Possible Execution** | [FILL IN] | — | **[Date and time in UTC, if known]** |
-
-*Note: The actual execution date depends on when signaling quorum is reached (if relevant), the proposal passes, and execution occurs.*
-
 ## Open Questions and Feedback
 
 - *Any Open Questions or Requests for Feedback for the Aztec community*

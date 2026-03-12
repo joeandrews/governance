@@ -11,7 +11,7 @@ The purpose of Aztec governance is to remove control over the network from the h
 - **AZIPs** – Offchain, version-controlled design documents that specify proposed changes to Aztec’s protocols, standards, or governance processes, serving as the canonical record of what should change and why.
 - **AZUPs** – Onchain upgrade bundles that package one or more AZIPs, plus their associated payload, into a concrete proposal for execution on the Aztec Network.
 - **Payloads** – Series of onchain commands that execute against protocol contracts (or update contract references) detailed by an approved AZUP.
-- **Signaling** – The process by which sequencers express support for an AZUP’s payload onchain; once a payload receives signals in at least 600 of 1,000 eligible slots, it is promoted to a formal onchain proposal.
+- **Signaling** – The process by which sequencers express support for an AZUP’s payload onchain; once a payload receives at least `QUORUM_SIZE` signals within a `ROUND_SIZE`-slot round (`GovernanceProposer.sol`), it is promoted to a formal onchain proposal.
 - **Onchain Proposals** – Governance objects created once a payload meets sequencer signaling thresholds, defining a specific upgrade that tokenholders can vote to accept or reject.
 - **Voting** – The onchain decision process in which eligible tokenholders lock tokens to cast “yea” or “nay” votes on proposals, with quorum and supermajority requirements determining whether an upgrade is authorized to execute.
 
@@ -21,7 +21,7 @@ The purpose of Aztec governance is to remove control over the network from the h
 
 Sequencers in Aztec are block producers and core governance actors. By running a sequencer node and staking into a rollup, they both build blocks and help steer protocol upgrades. 
 
-Before AZUPs are presented to tokenholders for voting, they must gather enough support from sequencers. Sequencers vote on the support of AZUPs via onchain signaling. 600 of 1,000 signals are needed from sequencers to advance an AZUP’s payload into the voting phase. This means sequencers collectively decide which AZUPs reach the formal voting stage.
+Before AZUPs are presented to tokenholders for voting, they must gather enough support from sequencers. Sequencers vote on the support of AZUPs via onchain signaling. `QUORUM_SIZE` of `ROUND_SIZE` signals are needed from sequencers (`GovernanceProposer.sol`) to advance an AZUP’s payload into the voting phase. This means sequencers collectively decide which AZUPs reach the formal voting stage.
 
 A sequencer’s staked capital is its voting power. By default, their stake is delegated through the Governance Staking Escrow (GSE) to the rollup contract, which automatically votes “yea” on AZUPs that came through the sequencer signaling path. This means sequencers passively support all AZUPs unless they explicitly delegate away from the rollup to an address they control and vote directly via the GSE.
 
@@ -41,9 +41,9 @@ If you would like to join the governance process and participate in the calls, j
 
 ## Tokenholders
 
-Tokenholders play a direct role in Aztec governance by staking their tokens and participating in onchain votes. Any tokenholder may participate in governance votes by connecting their wallet to the governance dashboard, depositing into the Governance contract, and locking tokens for at least 38 days to ensure proposals can be executed before they exit. 
+Tokenholders play a direct role in Aztec governance by staking their tokens and participating in onchain votes. Any tokenholder may participate in governance votes by connecting their wallet to the governance dashboard, depositing into the Governance contract, and locking tokens for the minimum lock period (`votingDelay + votingDuration + executionDelay` in `Governance.sol`) to ensure proposals can be executed before they exit. 
 
-Once a proposal is created by sequencers, all eligible stakers can vote during a 7-day voting window, following a fixed timeline that includes an initial waiting period, a voting period, an execution delay, and a final grace period for execution. For a proposal to pass, at least 20% of the total voting power in governance must participate, at least 66% of votes cast must be yea, and at least 100,000,000 tokens must be deposited in governance.
+Once a proposal is created by sequencers, all eligible stakers can vote during the `votingDuration` window, following a fixed timeline that includes an initial waiting period, a voting period, an execution delay, and a final grace period for execution. For a proposal to pass, the `quorum` of total voting power must participate, the `requiredYeaMargin` must be met, and at least `minimumVotes` tokens must be deposited in governance (all fields from `getConfiguration()` in `Governance.sol`).
 
 Aztec Labs and Aztec Foundation teams, as well as investors, are excluded from staking and governance for the first 12 months (including the TGE vote), with their tokens locked for 1 year and then vesting over the following 2 years. 
 
@@ -61,7 +61,7 @@ The current AZIP process is defined by the [AZIP Process](azip-process.md).
 
 AZUPs (AZtec Upgrade Proposals) bundle the implementations of one or more AZIPs that Core Contributors have approved for inclusion in the Aztec Network. Once an AZUP is scheduled, its onchain payload is deployed to mainnet, where it is submitted to sequencers for signaling.
 
-Once sequencers have signaled support for the deployed payload, anyone can promote it to a formal onchain governance proposal. After a 3-day review delay, the proposal enters a 7-day voting window where staked tokenholders vote “yea” or “nay”. If quorum, supermajority, and participation thresholds are met, the proposal passes. After a final 30-day execution delay, the proposal can then be executed by anyone within the grace period (`getGracePeriod()` in `Governance.sol`), implementing the AZUP onchain. If not executed within the grace period, the proposal expires.
+Once sequencers have signaled support for the deployed payload, anyone can promote it to a formal onchain governance proposal. After a `votingDelay` review period, the proposal enters a `votingDuration` voting window where staked tokenholders vote “yea” or “nay”. If quorum, supermajority, and participation thresholds are met, the proposal passes. After an `executionDelay`, the proposal can then be executed by anyone within the `gracePeriod` (all fields from `getConfiguration()` in `Governance.sol`), implementing the AZUP onchain. If not executed within the grace period, the proposal expires.
 
 ### Process
 
@@ -71,16 +71,22 @@ The current AZUP process is defined by the [AZUP Process](azup-process.md).
 flowchart LR
     A["AZIP\n(Specification)"] --> B["AZUP\n(Upgrade Proposal)"]
     B --> C["Payload Deployed\n(Ethereum Mainnet)"]
-    C --> D["Sequencer Signaling\n(600/1,000 slots)"]
+    C --> D["Sequencer Signaling\n(QUORUM_SIZE/ROUND_SIZE)"]
     D --> E["Proposal Created"]
-    E --> F["Voting Delay\n(3 days)"]
-    F --> G["Voting Period\n(7 days)"]
-    G --> H{"Quorum 20%\nSupermajority 66%\nMin 100M tokens"}
-    H -- Pass --> I["Execution Delay\n(30 days)"]
+    E --> F["Voting Delay\n(votingDelay)"]
+    F --> G["Voting Period\n(votingDuration)"]
+    G --> H{"quorum\nrequiredYeaMargin\nminimumVotes"}
+    H -- Pass --> I["Execution Delay\n(executionDelay)"]
     H -- Fail --> J["Failed"]
     I --> K["Execution\n(Grace Period)"]
     K --> L["Upgrade Live"]
 ```
+
+## Updating the Governance Process
+
+The governance process documents (this manual, the AZIP process, and the AZUP process) can be updated without going through a formal AZIP. Proposed changes should be raised as a thread in [GitHub Discussions](https://github.com/AztecProtocol/governance/discussions) so the community can review and provide feedback. Once rough consensus is reached among Core Contributors, the change is applied via a pull request to the governance repository.
+
+Substantive changes to the process — such as introducing new AZIP categories, changing how proposals advance, or altering the role of governance bodies — should be discussed broadly before being merged. Editorial fixes, clarifications, and minor updates do not require a formal discussion thread.
 
 ## Disputes and Disagreements
 

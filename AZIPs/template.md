@@ -60,6 +60,10 @@ The `discussions-to` header will indicate the URL of the GitHub Discussions thre
 
 - *Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.*
 
+## Impacted Stakeholders
+
+- *For each stakeholder group affected by this proposal, write a paragraph describing the impact and summarizing any relevant discussions held with that group. Consider: Oracles, Wallets, Block Explorers, RPCs, Intent Bridges, Indexing Protocols, Messaging Bridges, Analytics Platforms, Liquidity Provisioning, Market Making, Co-Snarks, Mobile Wallets, AMMs, Lending Markets, NFTs, Extension Wallets, Token Bridges, Fintech Apps, Gaming, Escrow, Stablecoins, Prediction Markets, Sequencers, Provers.*
+
 ## Motivation
 
 - *A motivation section is required for all AZIPs. It should clearly explain why the existing protocol specification is inadequate to address the problem that the AZIP solves.*
