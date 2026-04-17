@@ -4,7 +4,7 @@
 
 | `azip` | `title` | `description` | `author` | `discussions-to` | `status` | `category` | `created` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| TBD | L1 Block Header Access | Make L1 block header data available to Noir contracts via a single Poseidon2 commitment. | Joe Andrews (@joeandrews, joe@aztec-labs.com) | TBD | Draft | Core | 2026-04-17 |
+| TBD | L1 Block Header Access | Make L1 block header data available to Noir contracts via a single Poseidon2 commitment. | Joe Andrews (@joeandrews, joe@aztec-labs.com) | https://github.com/AztecProtocol/governance/discussions/12 | Draft | Core | 2026-04-17 |
 
 ## Abstract
 
