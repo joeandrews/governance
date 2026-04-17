@@ -1,128 +1,95 @@
-# Aztec Improvement Proposal: L1 Block Roots in Contract Context
+# Aztec Improvement Proposal: Include L1 Block Header 
 
 ## Preamble
 
 | `azip` | `title` | `description` | `author` | `discussions-to` | `status` | `category` | `created` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| TBD | L1 Block Roots in Contract Context | Expose Ethereum L1 state, transaction, and receipt roots in the Noir contract execution context. | Joe Andrews (@joeandrews, joe@aztec-labs.com) | TBD | Draft | Core | 2026-04-15 |
+| TBD | L1 Block Header Access | Make L1 block header data available to Noir contracts via a single Poseidon2 commitment. | Joe Andrews (@joeandrews, joe@aztec-labs.com) | TBD | Draft | Core | 2026-04-17 |
 
 ## Abstract
 
-This AZIP adds L1 block roots to the `GlobalVariables` accessible by Noir contracts. It exposes the `stateRoot`, `transactionsRoot`, and `receiptsRoot` from the L1 block header referenced by the current checkpoint, along with that block's number. Combined with Merkle-Patricia trie proofs verified in Noir, this enables trustless reads of arbitrary L1 state, transactions, and event logs without oracles.
+Aztec contracts cannot read Ethereum state. This AZIP modifies the protocol by committing six L1 block header fields into a single Poseidon2 hash in `GlobalVariables`. It reuses the L1→L2 message dual-hash pattern: SHA256 anchors the commitment on L1 at propose time, the block root first rollup circuits bridge it to Poseidon2, and the result lands in the `BlockHeader`. Contracts open the commitment with a witness preimage, then use individual fields for MPT proofs, receipt proofs, or beacon state proofs. Total cost: ~10k gas per checkpoint, and one new AVM opcode.
 
 ## Impacted Stakeholders
 
-**Oracles.** Many oracle use cases (L1 balances, storage reads, Uniswap TWAPs) become replaceable by MPT proofs against `stateRoot`. Oracles may still add value by pre-computing proofs off-chain.
-
-**Token Bridges.** Bridges can verify L1 deposit events directly via `receiptsRoot` proof, providing an alternative to the inbox message path.
-
-**DeFi (Lending, AMMs).** L1 collateral positions, price feeds, and liquidity state become verifiable via `stateRoot` proofs, reducing cross-chain trust assumptions.
-
-**Wallets and Block Explorers.** L1 roots reflect L1 state with a lag of at least one L2 slot. User-facing tools SHOULD communicate this.
-
-**Sequencers.** Sequencers MUST include the L1 block header RLP in their `propose()` calldata for on-chain verification. Gas overhead is minimal (~10k per checkpoint).
-
-**Provers.** The rollup circuit MUST constrain that each block's `GlobalVariables.l1_roots` matches the checkpoint's `ProposedHeader` L1 root fields. This is a small number of equality constraints per block — minimal overhead.
+Relevant to any application reasoning about L1 state: oracle providers, token bridges, lending protocols, restaking protocols, and contracts currently relying on L1→L2 messages to shuttle L1 data into Aztec. Sequencers must include ~550 bytes of additional calldata when proposing checkpoints.
 
 ## Motivation
 
-Aztec contracts have no native mechanism to read L1 state, all interactions must be sent as messages currently. Any L1-dependent logic requires an external oracle, introducing trust assumptions and fragmented infrastructure. Since Aztec settles on Ethereum, every checkpoint implicitly references an L1 block. Exposing that block's roots inside the execution context requires minimal protocol changes while unlocking trustless L1 reads for any application.
+If an Aztec contract wants to know anything about Ethereum — a balance, a price, whether a deposit landed — it must trust an oracle or poke a message through the L1→L2 inbox. Both add latency, cost, and trust assumptions.
 
-Exposing all three roots (not just `stateRoot`) maximizes utility: `stateRoot` covers account and storage proofs, `transactionsRoot` enables proving transaction inclusion, and `receiptsRoot` enables proving event emission and transaction outcomes. Together these make every Aztec contract a co-processor to Ethereum, unlocking significant use cases.
+As Aztec is an Ethereum rollup. Every checkpoint already references an L1 block. This AZIP exposes that block's header to contracts, so any L1 state can be proven with a Merkle-Patricia trie proof in Noir, with no trust beyond L1 consensus.
+
+Rather than adding six fields to `GlobalVariables` (six Fields in every `BlockHeader` hash, six AVM opcodes, six fields through the rollup circuits), we commit them behind a single Poseidon2 hash. Contracts provide the preimage as a witness and open it — one hash check. One Field, one opcode, and extensible: adding header fields later requires only a preimage struct update.
 
 ## Specification
 
 > The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-### 1. GlobalVariables Extension
-
-The `GlobalVariables` struct SHALL be extended with:
+### What gets committed
 
 ```noir
-struct L1Roots {
-    state_root: Field,
-    transactions_root: Field,
-    receipts_root: Field,
-    block_number: u64,
+struct L1BlockHeader {
+    state_root: Field,        // MPT proofs for accounts, balances, storage, code
+    receipts_root: Field,     // event/receipt proofs — bridge deposit verification
+    block_number: u64,        // block identification; needed for blockhash lookup
+    timestamp: u64,           // L1 clock — contracts can enforce proof freshness
+    prev_randao: Field,       // beacon chain randomness — public entropy source
+    parent_beacon_block_root: Field,  // beacon chain state — validator sets, staking
 }
 ```
 
-All blocks within a checkpoint share the same `L1Roots` values, consistent with how `timestamp`, `slot_number`, and `gas_fees` are already checkpoint-level constants.
+### Plumbing l1BlockHash
 
-### 2. Context Accessors
+This reuses the L1→L2 message dual-hash pattern: SHA256 for the L1 anchor (EVM precompile), Poseidon2 for circuits. The parity circuits bridge L1→L2 messages the same way.
 
-**Public context.** Four new AVM opcodes SHALL be added: `L1STATEROOT`, `L1TXROOT`, `L1RECEIPTSROOT`, and `L1BLOCKNUMBER`. The `PublicContext` SHALL expose corresponding methods:
-
-```noir
-pub fn l1_state_root(_self: Self) -> Field {
-    unsafe { avm::l1_state_root() }
-}
-pub fn l1_transactions_root(_self: Self) -> Field {
-    unsafe { avm::l1_transactions_root() }
-}
-pub fn l1_receipts_root(_self: Self) -> Field {
-    unsafe { avm::l1_receipts_root() }
-}
-pub fn l1_block_number(_self: Self) -> u64 {
-    unsafe { avm::l1_block_number() }
-}
-```
-
-**Private context.** L1 roots are verified on L1 against `blockhash` via the `ProposedHeader`, and the rollup circuit constrains that each block's `GlobalVariables.l1_roots` matches those `ProposedHeader` values. The resulting `BlockHeader` (containing the constrained `GlobalVariables`) is hashed into the archive tree. Private functions access the `anchor_block_header` validated via archive tree membership, so `L1Roots` values are available through `BlockHeader.global_variables.l1_roots`. Convenience methods SHALL be added to `PrivateContext`:
-
-```noir
-pub fn l1_state_root(self) -> Field {
-    self.anchor_block_header.global_variables.l1_roots.state_root
-}
-```
-
-And equivalently for `l1_transactions_root`, `l1_receipts_root`, and `l1_block_number`.
-
-### 3. ProposedHeader Extension
-
-The `ProposedHeader` struct MUST be extended with:
-
-| Field | Type | Description |
+| | L1→L2 Messages | L1 Block Header |
 | --- | --- | --- |
-| `l1StateRoot` | `bytes32` | `stateRoot` from the referenced L1 block header. |
-| `l1TransactionsRoot` | `bytes32` | `transactionsRoot` from the referenced L1 block header. |
-| `l1ReceiptsRoot` | `bytes32` | `receiptsRoot` from the referenced L1 block header. |
-| `l1BlockNumber` | `uint64` | The referenced L1 block number. |
+| **L1 anchor** | `inbox.consume()` → SHA256 | `blockhash` + RLP → `sha256ToField` |
+| **ProposedHeader** | `inHash` | `l1BlockHash` |
+| **Block root first rollup** | Parity: SHA256 + Poseidon | Witnesses: SHA256 + Poseidon2 |
+| **Propagation** | `in_hash` through merges | `l1_block_hash_sha256` through merges |
+| **Contract access** | Messages in L1→L2 tree | `l1_block_hash` in `GlobalVariables` |
 
-The `ProposedHeaderLib.hash()` function MUST include these fields.
+The SHA256 check must happen at propose time because the L1 opcode `blockhash` only covers the last 256 L1 blocks, by epoch proof submission, the block may be outside this window and not accessible. 
 
-### 4. L1 Verification in `propose()`
+### L1 verification in `propose()`
 
-The proposer MUST submit the RLP-encoded L1 block header as additional calldata. The `propose()` function MUST:
+The proposer submits the RLP-encoded L1 block header and `l1BlockNumber` as calldata. `propose()` verifies:
 
-1. Verify `keccak256(rlpHeader) == blockhash(l1BlockNumber)`.
-2. Verify `l1BlockNumber` is strictly greater than the `l1BlockNumber` stored for the previous checkpoint.
-3. Extract `stateRoot`, `transactionsRoot`, and `receiptsRoot` at their fixed byte offsets in the RLP encoding. The first three header fields (`parentHash` 32 bytes, `sha3Uncles` 32 bytes, `beneficiary` 20 bytes) are fixed-size, placing `stateRoot` at byte 91, `transactionsRoot` at byte 124, and `receiptsRoot` at byte 157 (each offset includes a 1-byte RLP prefix per field and a 3-byte list prefix).
-4. Verify the extracted values match the `ProposedHeader` fields.
-5. Store `l1BlockNumber` for use in the next checkpoint's monotonicity check.
+1. `keccak256(rlpHeader) == blockhash(l1BlockNumber)` — the header is real.
+2. `l1BlockNumber >= block.number - MAX_L1_BLOCK_LAG` — the header is fresh.
+3. `sha256ToField(extracted_fields) == ProposedHeader.l1BlockHash` — the commitment matches.
 
-The `blockhash` opcode covers the last 256 L1 blocks (~51 minutes), which is sufficient since the referenced block will be recent. The `l1BlockNumber` MUST be strictly greater than the `l1BlockNumber` of the previous checkpoint, ensuring L1 roots advance monotonically. The sequencer SHOULD reference the most recent L1 block available at the time of checkpoint construction to maximize freshness.
+Without the freshness check, a sequencer could reference any block within the 256-block `blockhash` window (~51 minutes of staleness) and manipulate oracles. `MAX_L1_BLOCK_LAG` SHOULD be `2 * AZTEC_SLOT_DURATION / ETHEREUM_SLOT_DURATION` (currently 12 blocks, ~144 seconds). `block.number` costs 2 gas, no storage required.
 
-### 5. Rollup Circuit Constraints
+`l1BlockNumber` is calldata-only — not stored, not in `ProposedHeader`. It's already committed inside the `sha256ToField` as one of the six fields. `ProposedHeader` gains a single field: `l1BlockHash` (`bytes32`).
 
-The rollup circuit MUST enforce that every block's `GlobalVariables.l1_roots` fields are equal to the corresponding `ProposedHeader` L1 root fields for the checkpoint containing that block. This ensures the values available to contracts (via `GlobalVariables`) are the same values verified on L1 (via `ProposedHeader`).
+### Rollup circuit constraints
 
-### 6. Historical L1 Root Lookups
+The block root first rollup circuits (all three variants) take the 6 header fields as private witnesses and:
 
-In private context, `get_block_header_at(l2_block_number)` returns any historical `BlockHeader` validated via archive tree membership. Since `L1Roots` is part of `GlobalVariables` within `BlockHeader`, contracts can verify MPT proofs against L1 roots from any past checkpoint — not only the current one. This is critical for avoiding stale proof issues: the user generates an MPT proof against a known L1 block off-chain, passes the corresponding L2 block number into the contract, and the contract looks up the historical roots to verify against.
+1. Compute `sha256ToField` → output as `l1_block_hash_sha256` in `BlockRollupPublicInputs`.
+2. Compute `poseidon2_hash` → store in `CheckpointConstantData.l1_block_hash`.
 
-In public context, only the current checkpoint's L1 roots are available via AVM opcodes. There is no historical lookup mechanism, consistent with how all other `GlobalVariables` fields behave in public functions.
+`l1_block_hash_sha256` propagates through block merges to the checkpoint root using the same pattern as `in_hash`: only the first block sets it, merge circuits assert the right rollup's value is 0, checkpoint root asserts nonzero. `GlobalVariables.l1_block_hash` is populated from `CheckpointConstantData` — same as `slot_number`, `coinbase`, `fee_recipient`, and `gas_fees`.
 
-### 7. Usage Pattern
+
+### Usage
+
+**Public:** one new AVM opcode `L1BLOCKHASH`.
+**Private:** reads from `anchor_block_header.global_variables.l1_block_hash` via archive tree membership.
+
+### Historical lookups
+
+`get_block_header_at(l2_block_number)` returns any historical `BlockHeader` via archive tree membership. Since `l1_block_hash` is in `GlobalVariables`, contracts can verify L1 proofs against any past checkpoint. Historical access is required to allow private storage proofs to be generated against a deterministic root, without being tied to a specific inclusion block. Public context has no historical lookup need as the sequencer is executing and the proof is constructed later when the `l1_block_hash` is known.
+
 
 ```noir
-// Robust pattern: verify L1 storage against a historical L1 root.
-// The caller provides the L2 block number whose checkpoint referenced
-// the L1 block their proof was generated against.
 fn verify_l1_storage(
     context: &mut PrivateContext,
     l2_block_number: u32,
-    l1_block_number: u64,
+    l1_header: L1BlockHeader,
     account: EthAddress,
     slot: Field,
     expected_value: Field,
@@ -130,75 +97,64 @@ fn verify_l1_storage(
     storage_proof: MPTProof,
 ) {
     let header = context.get_block_header_at(l2_block_number);
-    let l1_roots = header.global_variables.l1_roots;
-    assert(l1_roots.block_number == l1_block_number);
-    let account_state = mpt::verify_account(l1_roots.state_root, account, account_proof);
-    mpt::verify_storage(account_state.storage_root, slot, expected_value, storage_proof);
-}
-
-// Verify an L1 event via receipts root (same historical pattern)
-fn verify_l1_event(
-    context: &mut PrivateContext,
-    l2_block_number: u32,
-    l1_block_number: u64,
-    tx_index: Field,
-    log_index: Field,
-    expected_log: Log,
-    receipt_proof: MPTProof,
-) {
-    let header = context.get_block_header_at(l2_block_number);
-    let l1_roots = header.global_variables.l1_roots;
-    assert(l1_roots.block_number == l1_block_number);
-    mpt::verify_receipt_log(l1_roots.receipts_root, tx_index, log_index, expected_log, receipt_proof);
+    assert(poseidon2_hash(l1_header.serialize()) == header.global_variables.l1_block_hash);
+    let acct = mpt::verify_account(l1_header.state_root, account, account_proof);
+    mpt::verify_storage(acct.storage_root, slot, expected_value, storage_proof);
 }
 ```
 
-MPT verification libraries are out of scope for this AZIP and MAY be standardized separately.
+A reference MPT implementation exists in `aztec-packages` at `noir-projects/noir-contracts/contracts/test/storage_proof_test_contract/src/storage_proofs/`.
 
-## Rationale
+## Gas Costs
 
-**Three roots, not one.** `stateRoot` alone covers storage and balance reads. Adding `transactionsRoot` and `receiptsRoot` costs negligible gas (~two extra `calldataload` operations at fixed offsets) and enables transaction inclusion and event proofs — critical for bridges and cross-chain messaging.
+| Operation | Gas |
+| --- | --- |
+| RLP header calldata (~550 bytes) | ~9,000 |
+| `l1BlockNumber` calldata (8 bytes) | ~128 |
+| `keccak256` over RLP header | ~130 |
+| `blockhash` + `block.number` | 22 |
+| Field extraction (6 × `calldataload`) | ~350 |
+| `sha256` precompile (~192 bytes) | ~160 |
+| **Total** | **~9,790** |
 
-**Checkpoint-level, not per-block.** All blocks in a checkpoint share the same `GlobalVariables`. Placing roots here avoids per-block L1 verification in `propose()` and keeps the mechanism simple. Freshness is bounded by slot duration (currently 72s). Applications needing sub-slot freshness should advocate for shorter slots via a separate proposal, which would automatically improve root freshness.
-
-**On-chain verification via `blockhash`.** Validating roots at propose time using `blockhash` + fixed-offset RLP extraction is cheap (~10k gas) and avoids proving keccak256/RLP inside a ZK circuit.
-
-**Including `block_number`.** Off-chain proof generators need to know which L1 block to build MPT proofs against.
-
-**Historical lookups via archive tree.** A user generating an MPT proof off-chain cannot predict which checkpoint their transaction will land in. If the contract could only verify against the current checkpoint's L1 roots, proofs would frequently go stale. The archive tree already stores all historical block headers; since `L1Roots` lives in `GlobalVariables`, historical roots are automatically available via `get_block_header_at()` in private context. This makes proofs valid indefinitely — the user simply passes the L2 block number corresponding to their proof's L1 block. Public context lacks historical lookups, consistent with all other `GlobalVariables` fields; applications requiring historical L1 reads in public functions should perform the verification in a preceding private call.
-
-**New AVM opcodes.** Following the existing pattern where each `GlobalVariables` field has a corresponding AVM opcode (`CHAINID`, `VERSION`, `BLOCKNUMBER`, `TIMESTAMP`), L1 roots are exposed through dedicated opcodes rather than a struct-returning instruction.
+No storage operations. Under 3% of existing `propose()` cost.
 
 ## Backwards Compatibility
 
-Adding fields to `GlobalVariables`, `BlockHeader`, and `ProposedHeader` is a breaking change to the block format. All sequencers, provers, and nodes MUST upgrade. This MUST be coordinated via an AZUP. Existing contracts that do not reference the new accessors are unaffected.
+New fields in `GlobalVariables`, `BlockHeader`, `CheckpointConstantData`, `CheckpointHeader`, and `ProposedHeader` break the block format. Upgrade via AZUP. Existing contracts unaffected.
 
-## Test Cases
+## Testing
 
-1. **Correct root inclusion.** Build a checkpoint referencing L1 block N. Verify `l1_state_root()`, `l1_transactions_root()`, and `l1_receipts_root()` match block N's header.
-2. **End-to-end storage proof.** Deploy an L1 contract with known storage. Verify a Merkle proof against `l1_state_root()` in an L2 contract.
-3. **Receipt proof.** Emit an event on L1. Prove its inclusion against `l1_receipts_root()` in an L2 contract.
-4. **Historical L1 root lookup.** Generate an MPT proof against L1 block X referenced by L2 block B. In a later checkpoint, call `get_block_header_at(B)` and verify the proof against the returned header's `l1_roots`. Assert success.
-5. **Historical private execution.** Execute a private function with an anchor block from checkpoint C. Verify L1 roots reflect checkpoint C's referenced L1 block, not the current tip.
-6. **Invalid root rejection.** Submit a `propose()` with mismatched roots. Verify the L1 contract reverts.
-7. **Out-of-range block rejection.** Submit a `propose()` with an `l1BlockNumber` outside the `blockhash` 256-block window. Verify revert.
-8. **Non-increasing block rejection.** Submit a `propose()` with an `l1BlockNumber` ≤ the previous checkpoint's `l1BlockNumber`. Verify revert.
+1. **Correct commitment.** 6 header fields as witnesses → `poseidon2_hash == context.l1_block_hash()`.
+2. **Storage proof.** MPT proof against opened `state_root`.
+3. **Receipt proof.** Event inclusion against opened `receipts_root`.
+4. **Beacon state proof.** Validator data against opened `parent_beacon_block_root`.
+5. **Historical lookup.** Past checkpoint's `l1_block_hash` via `get_block_header_at()`.
+6. **Invalid commitment.** Mismatched `sha256ToField` → revert.
+7. **Out-of-range block.** `l1BlockNumber` outside `blockhash` window → revert.
+8. **Stale block.** `l1BlockNumber < block.number - MAX_L1_BLOCK_LAG` → revert.
+
+## Scope of Changes
+
+**L1 Contracts:** `ProposedHeaderLib.sol` (add `l1BlockHash`), `ProposeLib.sol` (RLP verification, freshness check, `sha256ToField`).
+
+**Noir Types:** `global_variables.nr`, `checkpoint_constant_data.nr`, `checkpoint_header.nr` (add `l1_block_hash`), `constants.nr` (update lengths).
+
+**Noir Rollup:** `block_root_first_rollup.nr` / `block_root_single_tx_first_rollup.nr` / `block_root_empty_tx_first_rollup.nr` (add witnesses, compute hashes), `block_rollup_public_inputs.nr` (add `l1_block_hash_sha256`), `block_rollup_public_inputs_composer.nr` (populate from constant data), `merge_block_rollups.nr` (propagate left), `validate_consecutive_block_rollups.nr` (assert right == 0), `checkpoint_rollup_public_inputs_composer.nr` / `checkpoint_root_inputs_validator.nr` (populate / assert nonzero).
+
+**Noir Libraries:** `public_context.nr`, `private_context.nr`, `avm.nr` (add `l1_block_hash()` accessor).
+
+**Sequencer:** `global_builder.ts` (compute Poseidon2), `checkpoint_proposal_job.ts` (include RLP calldata), `checkpoint_header.ts` (add field).
 
 ## Security Considerations
 
-**L1 reorgs.** The exposed roots inherit the rollup's existing L1 reorg risk. Roots are only final once the L1 block they reference is final. High-value applications SHOULD account for L1 finality.
+**L1 reorgs.** Inherits existing rollup reorg risk. High-value applications SHOULD wait for L1 finality.
 
-**Stale state.** Roots lag behind the L1 tip by at least one slot (~72s, ~6 L1 blocks). Applications MUST NOT assume current L1 state.
+**Staleness of L1 Block.** Bounded by `MAX_L1_BLOCK_LAG` (~144s) plus slot duration (~72s). Contracts can enforce tighter bounds via `l1_header.timestamp`.
 
-**MPT proof correctness.** Security of L1 reads depends on correct MPT verification. Each implementation MUST be independently audited. The Aztec team SHOULD provide a canonical, audited MPT library.
+**MPT proof correctness.** Security depends on Noir MPT verification. Implementations MUST be audited.
 
-**`blockhash` window.** The 256-block window (~51 minutes) is sufficient for current slot durations. If slot durations increase significantly, this assumption MUST be revisited.
-
-**Sequencer liveness.** A dishonest sequencer cannot forge roots (they are verified on-chain against `blockhash`), but could reference an L1 block only marginally newer than the previous checkpoint's, increasing staleness. The monotonicity requirement bounds drift: the sequencer must advance by at least one L1 block per checkpoint. Combined with the `blockhash` window, this limits maximum staleness.
-
-**Constraint completeness.** The rollup circuit MUST fully constrain that `GlobalVariables.l1_roots` matches the `ProposedHeader` L1 root fields. An under-constrained circuit could allow a malicious prover to make contracts see different L1 roots than those verified on L1. This MUST be covered by rollup circuit audits.
-
-**No new trust assumptions.** Roots are verified on L1 against `blockhash`. The security model adds nothing beyond the existing assumption that L1 consensus is honest.
+**Constraint completeness.** SHA256→Poseidon2 bridge MUST be fully constrained. Implementations MUST be audited.
 
 ## Copyright Waiver
 
