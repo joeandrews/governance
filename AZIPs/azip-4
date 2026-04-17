@@ -1,10 +1,10 @@
-# Aztec Improvement Proposal: Include L1 Block Header 
+# Aztec Improvement Proposal: Include L1 Block Header
 
 ## Preamble
 
-| `azip` | `title` | `description` | `author` | `discussions-to` | `status` | `category` | `created` |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| TBD | L1 Block Header Access | Make L1 block header data available to Noir contracts via a single Poseidon2 commitment. | Joe Andrews (@joeandrews, joe@aztec-labs.com) | https://github.com/AztecProtocol/governance/discussions/12 | Draft | Core | 2026-04-17 |
+| `azip` | `title`                | `description`                                                                            | `author`                                      | `discussions-to`                                           | `status` | `category` | `created`  |
+| ------ | ---------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------- | -------- | ---------- | ---------- |
+| TBD    | L1 Block Header Access | Make L1 block header data available to Noir contracts via a single Poseidon2 commitment. | Joe Andrews (@joeandrews, joe@aztec-labs.com) | https://github.com/AztecProtocol/governance/discussions/12 | Draft    | Core       | 2026-04-17 |
 
 ## Abstract
 
@@ -43,15 +43,15 @@ struct L1BlockHeader {
 
 This reuses the L1→L2 message dual-hash pattern: SHA256 for the L1 anchor (EVM precompile), Poseidon2 for circuits. The parity circuits bridge L1→L2 messages the same way.
 
-| | L1→L2 Messages | L1 Block Header |
-| --- | --- | --- |
-| **L1 anchor** | `inbox.consume()` → SHA256 | `blockhash` + RLP → `sha256ToField` |
-| **ProposedHeader** | `inHash` | `l1BlockHash` |
-| **Block root first rollup** | Parity: SHA256 + Poseidon | Witnesses: SHA256 + Poseidon2 |
-| **Propagation** | `in_hash` through merges | `l1_block_hash_sha256` through merges |
-| **Contract access** | Messages in L1→L2 tree | `l1_block_hash` in `GlobalVariables` |
+|                             | L1→L2 Messages             | L1 Block Header                       |
+| --------------------------- | -------------------------- | ------------------------------------- |
+| **L1 anchor**               | `inbox.consume()` → SHA256 | `blockhash` + RLP → `sha256ToField`   |
+| **ProposedHeader**          | `inHash`                   | `l1BlockHash`                         |
+| **Block root first rollup** | Parity: SHA256 + Poseidon  | Witnesses: SHA256 + Poseidon2         |
+| **Propagation**             | `in_hash` through merges   | `l1_block_hash_sha256` through merges |
+| **Contract access**         | Messages in L1→L2 tree     | `l1_block_hash` in `GlobalVariables`  |
 
-The SHA256 check must happen at propose time because the L1 opcode `blockhash` only covers the last 256 L1 blocks, by epoch proof submission, the block may be outside this window and not accessible. 
+The SHA256 check must happen at propose time because the L1 opcode `blockhash` only covers the last 256 L1 blocks, by epoch proof submission, the block may be outside this window and not accessible.
 
 ### L1 verification in `propose()`
 
@@ -74,7 +74,6 @@ The block root first rollup circuits (all three variants) take the 6 header fiel
 
 `l1_block_hash_sha256` propagates through block merges to the checkpoint root using the same pattern as `in_hash`: only the first block sets it, merge circuits assert the right rollup's value is 0, checkpoint root asserts nonzero. `GlobalVariables.l1_block_hash` is populated from `CheckpointConstantData` — same as `slot_number`, `coinbase`, `fee_recipient`, and `gas_fees`.
 
-
 ### Usage
 
 **Public:** one new AVM opcode `L1BLOCKHASH`.
@@ -83,7 +82,6 @@ The block root first rollup circuits (all three variants) take the 6 header fiel
 ### Historical lookups
 
 `get_block_header_at(l2_block_number)` returns any historical `BlockHeader` via archive tree membership. Since `l1_block_hash` is in `GlobalVariables`, contracts can verify L1 proofs against any past checkpoint. Historical access is required to allow private storage proofs to be generated against a deterministic root, without being tied to a specific inclusion block. Public context has no historical lookup need as the sequencer is executing and the proof is constructed later when the `l1_block_hash` is known.
-
 
 ```noir
 fn verify_l1_storage(
@@ -107,15 +105,15 @@ A reference MPT implementation exists in `aztec-packages` at `noir-projects/noir
 
 ## Gas Costs
 
-| Operation | Gas |
-| --- | --- |
-| RLP header calldata (~550 bytes) | ~9,000 |
-| `l1BlockNumber` calldata (8 bytes) | ~128 |
-| `keccak256` over RLP header | ~130 |
-| `blockhash` + `block.number` | 22 |
-| Field extraction (6 × `calldataload`) | ~350 |
-| `sha256` precompile (~192 bytes) | ~160 |
-| **Total** | **~9,790** |
+| Operation                             | Gas        |
+| ------------------------------------- | ---------- |
+| RLP header calldata (~550 bytes)      | ~9,000     |
+| `l1BlockNumber` calldata (8 bytes)    | ~128       |
+| `keccak256` over RLP header           | ~130       |
+| `blockhash` + `block.number`          | 22         |
+| Field extraction (6 × `calldataload`) | ~350       |
+| `sha256` precompile (~192 bytes)      | ~160       |
+| **Total**                             | **~9,790** |
 
 No storage operations. Under 3% of existing `propose()` cost.
 
